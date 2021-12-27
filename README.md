@@ -1,2 +1,2 @@
 # trits-go-lab
-Trits evaluation in golang
+Trits evaluation lab in golang
