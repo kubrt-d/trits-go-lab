@@ -25,4 +25,14 @@ func TestTritsAddress_Raw(t *testing.T) {
 		}
 	})
 
+	t.Run("Compare raw string", func(t *testing.T) {
+		var valid rawaddr = []byte("e28533750bee16842a5cd4f533d235770e407367")
+		var x string = "e28533750bee16842a5cd4f533d235770e407367"
+		a := NewTritsAddress(valid)
+		got := a.SameAs(x)
+		if got {
+			t.Errorf("TritsTriangle.SameAs() = %v, want %v", got, true)
+		}
+	})
+
 }

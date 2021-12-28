@@ -3,6 +3,7 @@ package tritslab
 import (
 	"encoding/hex"
 	"log"
+	"strings"
 )
 
 // TODO: Implement real IOTA address
@@ -45,4 +46,12 @@ func (a *TritsAddress) Raw() rawaddr {
 
 func (a *TritsAddress) Human() humanaddr {
 	return humanaddr(a.addr[32:40])
+}
+
+func (a *TritsAddress) SameAs(as string) bool {
+	if strings.Compare(string(a.addr), as) == 0 {
+		return true
+	} else {
+		return false
+	}
 }
