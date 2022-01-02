@@ -15,19 +15,17 @@ import (
    for human readable
 */
 
-type rawaddr []byte
-type humanaddr []byte
-
 type TritsAddress struct {
-	addr rawaddr
+	addr string
 }
 
-func NewTritsAddress(a rawaddr) *TritsAddress {
+// Constructor - validate string and create address struct
+func NewTritsAddress(a string) *TritsAddress {
 	address := new(TritsAddress)
 
 	/* Validate the input string */
 	dst := make([]byte, hex.DecodedLen(len(a)))
-	n, err := hex.Decode(dst, a)
+	n, err := hex.Decode(dst, []byte(a))
 	//TODO:  Maybe doesn't have to be fatal
 	if err != nil {
 		log.Fatal(err)
@@ -40,14 +38,40 @@ func NewTritsAddress(a rawaddr) *TritsAddress {
 	return address
 }
 
-func (a *TritsAddress) Raw() rawaddr {
-	return a.addr
+// Return address as a raw string
+func (a *TritsAddress) Raw() string {
+	if a != nil {
+		return a.addr
+	} else {
+		return NoAddr
+	}
 }
 
-func (a *TritsAddress) Human() humanaddr {
-	return humanaddr(a.addr[32:40])
+// Return address is a human readable form
+func (a *TritsAddress) Human() string {
+	if a != nil {
+		return string(a.addr[32:40])
+	} else {
+		return string(NoAddr[32:40])
+	}
 }
 
+// Compare two addresses 
+func (a *TritsAddress) Equals(to *TritsAddress) bool {
+	if to == nil && a == nil {
+		return true
+	}
+	if to == nil || a == nil {
+		return false
+	}
+	if strings.Compare(a.addr, to.addr) == 0 {
+		return true
+	} else {
+		return false
+	}
+}
+
+// Compare address with a raw string 
 func (a *TritsAddress) SameAs(as string) bool {
 	if strings.Compare(string(a.addr), as) == 0 {
 		return true

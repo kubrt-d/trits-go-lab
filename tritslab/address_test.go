@@ -8,7 +8,7 @@ import (
 func TestTritsAddress_Raw(t *testing.T) {
 
 	t.Run("Valid raw address", func(t *testing.T) {
-		var valid rawaddr = []byte("e28533750bee16842a5cd4f533d235770e407367")
+		var valid string = "e28533750bee16842a5cd4f533d235770e407367"
 		a := NewTritsAddress(valid)
 		got := a.Raw()
 		if strings.Compare(string(got), string(valid)) != 0 {
@@ -17,7 +17,7 @@ func TestTritsAddress_Raw(t *testing.T) {
 	})
 
 	t.Run("Valid human address", func(t *testing.T) {
-		var valid rawaddr = []byte("e28533750bee16842a5cd4f533d235770e407367")
+		var valid string = "e28533750bee16842a5cd4f533d235770e407367"
 		a := NewTritsAddress(valid)
 		got := a.Human()
 		if strings.Compare(string(got), "0e407367") != 0 {
@@ -26,7 +26,7 @@ func TestTritsAddress_Raw(t *testing.T) {
 	})
 
 	t.Run("Compare raw string", func(t *testing.T) {
-		var valid rawaddr = []byte("e28533750bee16842a5cd4f533d235770e407367")
+		var valid string = "e28533750bee16842a5cd4f533d235770e407367"
 		var x string = "e28533750bee16842a5cd4f533d235770e407367"
 		a := NewTritsAddress(valid)
 		got := a.SameAs(x)
