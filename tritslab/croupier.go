@@ -15,6 +15,6 @@ func NewTritsCroupier() *TritsCroupier {
 
 // Choose the table
 func (p *TritsCroupier) AskAround() int8 {
-	return 
+	return 1
 }
 
