@@ -6,7 +6,7 @@ import (
 
 func TestTritsCroupier_AskAround(t *testing.T) {
 	t.Run("Test croupier constructor", func(t *testing.T) {
-		b := NewTritsCroupier(1000000)	
+		b := NewTritsCroupier(1000000, 50000)
 		got := b
 		if got != nil {
 

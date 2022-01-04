@@ -1,6 +1,10 @@
 package tritslab
 
-const outweight int8 = 3
+import (
+	"sort"
+)
+
+const OUTWEIGHT int8 = 3
 
 type TritsTriangle struct {
 	V1, V2, V3 []*TritsAddress
@@ -24,28 +28,17 @@ func (t *TritsTriangle) HitVertice(vertice int8, by *TritsAddress) bool {
 	switch vertice {
 	case 1:
 		t.V1 = append(t.V1, by)
-		if len(t.V1)-len(t.V2) >= int(outweight) {
-			return true
-		}
-		if len(t.V1)-len(t.V3) >= int(outweight) {
-			return true
-		}
 	case 2:
 		t.V2 = append(t.V2, by)
-		if len(t.V2)-len(t.V1) >= int(outweight) {
-			return true
-		}
-		if len(t.V2)-len(t.V3) >= int(outweight) {
-			return true
-		}
 	case 3:
 		t.V3 = append(t.V3, by)
-		if len(t.V3)-len(t.V1) >= int(outweight) {
-			return true
-		}
-		if len(t.V3)-len(t.V2) >= int(outweight) {
-			return true
-		}
 	}
-	return false
+	return t.Inbalance() == OUTWEIGHT
+}
+
+// Returns the max difference between arms [0,1 or 2]
+func (t *TritsTriangle) Inbalance() int8 {
+	s := []int{len(t.V1), len(t.V2), len(t.V3)}
+	sort.Ints(s)
+	return int8(s[2] - s[0])
 }

@@ -1,6 +1,8 @@
 package tritslab
 
-import "testing"
+import (
+	"testing"
+)
 
 func TestTritsTable_GetCityName(t *testing.T) {
 	type fields struct {
@@ -17,7 +19,7 @@ func TestTritsTable_GetCityName(t *testing.T) {
 	}{
 		{
 			name: "Get Karachi",
-			args: args {
+			args: args{
 				index: 10,
 			},
 			want: "Karachi",
@@ -33,4 +35,14 @@ func TestTritsTable_GetCityName(t *testing.T) {
 			}
 		})
 	}
+}
+
+func TestTritsTable_GetCityAddress(t *testing.T) {
+	tr := NewTritsTable()
+	got := tr.GetCityAddress(22)
+	if !got.SameAs("1000022600000000100000001000000010000022") {
+		t.Errorf("TritsTable.GetCityAddress() = %v, want %v", got,
+			"10000022600000000100000001000000010000022")
+	}
+
 }

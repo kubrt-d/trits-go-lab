@@ -1,8 +1,5 @@
 package tritslab
 
-import (
-)
-
 const GamesOnTable = 23
 
 type TritsTable struct {
@@ -12,17 +9,17 @@ type TritsTable struct {
 func NewTritsTable() *TritsTable {
 	dice := NewTritsDice()
 	t := new(TritsTable)
-	var i int8 = 0 
-	for i<GamesOnTable {
-		game := NewTritsGame(t.GetCityAddress(i),TRITS_GAME_LONGEVITY,dice)
-		t.table  = append(t.table,game)
+	var i int8 = 0
+	for i < GamesOnTable {
+		game := NewTritsGame(t.GetCityAddress(i), TRITS_GAME_LONGEVITY, dice)
+		t.table = append(t.table, game)
 		i++
 	}
 	return t
 }
 
-// Define city names 
-func (t *TritsTable) GetCityName(index int8 ) string {
+// Define city names
+func (t *TritsTable) GetCityName(index int8) string {
 	var cities = [GamesOnTable]string{
 		"Tokyo",
 		"Delhi",
@@ -47,15 +44,15 @@ func (t *TritsTable) GetCityName(index int8 ) string {
 		"RioDeJaneiro",
 		"Lahore",
 		"Bangalore"}
-	if (index >=0 && index < GamesOnTable ) {
+	if index >= 0 && index < GamesOnTable {
 		return cities[index]
 	} else {
 		return ""
-	}	
+	}
 }
 
-// Define an address for each city 
-func (t *TritsTable) GetCityAddress(index int8 ) *TritsAddress {
+// Define an address for each city
+func (t *TritsTable) GetCityAddress(index int8) *TritsAddress {
 	var addresses = [GamesOnTable]*TritsAddress{
 		NewTritsAddress("1000000010000000100000001000000010000000"),
 		NewTritsAddress("1000000110000000100000001000000010000001"),
@@ -77,14 +74,13 @@ func (t *TritsTable) GetCityAddress(index int8 ) *TritsAddress {
 		NewTritsAddress("1000001700000000100000001000000010000017"),
 		NewTritsAddress("1000001800000000100000001000000010000018"),
 		NewTritsAddress("1000001900000000100000001000000010000019"),
-		NewTritsAddress("10000020600000000100000001000000010000020"),
-		NewTritsAddress("10000021600000000100000001000000010000021"),
-		NewTritsAddress("10000022600000000100000001000000010000022"),
-		}
-	if (index >=0 && index < GamesOnTable ) {
+		NewTritsAddress("1000020600000000100000001000000010000020"),
+		NewTritsAddress("1000021600000000100000001000000010000021"),
+		NewTritsAddress("1000022600000000100000001000000010000022"),
+	}
+	if index >= 0 && index < GamesOnTable {
 		return addresses[index]
 	} else {
 		return nil
-	}	
+	}
 }
-

@@ -165,7 +165,11 @@ func (game *TritsGame) PlaceCoin(from *TritsAddress, amount uint32) []*TritsGame
 	return responses // Nothing to do - TODO: should this be an error as it should never happen ?
 }
 
-/* Get the total on the table */
+// Get the total on the table
 func (game *TritsGame) GetTotal() uint32 {
 	return game.Nominal * (uint32(len(game.Trit.V1)) + uint32(len(game.Trit.V2)) + uint32(len(game.Trit.V3)) + game.Middle)
+}
+
+func (game *TritsGame) GetInbalance() int8 {
+	return game.Trit.Inbalance()
 }
