@@ -6,10 +6,10 @@ import (
 
 func TestTritsTable_GetCityName(t *testing.T) {
 	type fields struct {
-		table []*TritsGame
+		desk []*TritsGame
 	}
 	type args struct {
-		index int8
+		index int
 	}
 	tests := []struct {
 		name   string
@@ -28,7 +28,7 @@ func TestTritsTable_GetCityName(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			tr := &TritsTable{
-				table: tt.fields.table,
+				desk: tt.fields.desk,
 			}
 			if got := tr.GetCityName(tt.args.index); got != tt.want {
 				t.Errorf("TritsTable.GetCityName() = %v, want %v", got, tt.want)

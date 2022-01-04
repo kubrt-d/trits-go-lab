@@ -11,7 +11,7 @@ type TritsGameResponse struct {
 	Action     int8          // what to do, one of ACTION_TRANSFER ACTION_ASK_BONUS
 	Funds_from *TritsAddress //	(optional) if funds transfer is involved, this tells from which address the funds should be taken
 	Funds_to   *TritsAddress //	(optional) if funds transfer is involved, this tells to which address the funds should be sent
-	Amount     uint32        //	(optonal) how much to send
+	Amount     uint64        //	(optonal) how much to send
 }
 
 func NewGameResponse() *TritsGameResponse { // Constructor
@@ -27,7 +27,7 @@ type TritsGame struct {
 	Trit       *TritsTriangle // It's the triangle that holds the status
 	ThisGame   *TritsAddress  // Address of this game
 	Owner      *TritsAddress  // Whoever starts the game owns the game
-	Nominal    uint32         // Game nominal (set by the first PlaceCoin call), 0 means the game has not yet started
+	Nominal    uint64         // Game nominal (set by the first PlaceCoin call), 0 means the game has not yet started
 	Middle     uint32         // Number of coins in the middle
 	with_bonus bool           // Did bank send the bonus (always unless it runs out of money)
 	updated    int64          // Nanotime last updated
@@ -53,7 +53,7 @@ func NewTritsGame(addr *TritsAddress, lifelength int64, rand Random3Dice) *Trits
 }
 
 /* Place coin on the trit - by the time this function is called, the amount has already been added to the game address */
-func (game *TritsGame) PlaceCoin(from *TritsAddress, amount uint32) []*TritsGameResponse {
+func (game *TritsGame) PlaceCoin(from *TritsAddress, amount uint64) []*TritsGameResponse {
 
 	var responses []*TritsGameResponse
 	response := NewGameResponse() // Default response is
@@ -80,8 +80,8 @@ func (game *TritsGame) PlaceCoin(from *TritsAddress, amount uint32) []*TritsGame
 			responses = append(responses, response)       // Add the response
 			return responses
 		}
-		coins := amount / game.Nominal    // How many coins did the banks sent ?
-		game.Middle = game.Middle + coins // Update the amount of coins in the midle
+		coins := uint32(amount / game.Nominal) // How many coins did the banks sent ?
+		game.Middle = game.Middle + coins      // Update the amount of coins in the midle
 		game.updated = time.Now().UnixNano()
 		game.with_bonus = true
 		return responses
@@ -166,10 +166,15 @@ func (game *TritsGame) PlaceCoin(from *TritsAddress, amount uint32) []*TritsGame
 }
 
 // Get the total on the table
-func (game *TritsGame) GetTotal() uint32 {
-	return game.Nominal * (uint32(len(game.Trit.V1)) + uint32(len(game.Trit.V2)) + uint32(len(game.Trit.V3)) + game.Middle)
+func (game *TritsGame) GetTotal() uint64 {
+	return game.Nominal * uint64((len(game.Trit.V1) + len(game.Trit.V2) + len(game.Trit.V3) + int(game.Middle)))
 }
 
 func (game *TritsGame) GetInbalance() int8 {
 	return game.Trit.Inbalance()
+}
+
+func (game *TritsGame) GetStatusString() string {
+	//TODO: compact game status for logging
+	return ""
 }

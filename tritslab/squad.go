@@ -23,25 +23,27 @@ const ArchitectAddr = "dddddddddddddddddddddddddddddddddddddddd"
 const BaneAddr = "eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee"
 
 type TritsSquad struct {
-	squad [14]*TritsPlayer // Our dear players
+	squad []*TritsPlayer // Our dear players
 }
 
 func NewTritsSquad(banker *TritsBanker) *TritsSquad {
 	s := new(TritsSquad)
-	s.squad[0] = NewTritsPlayer(NewTritsAddress(NeoAddr), banker)
-	s.squad[1] = NewTritsPlayer(NewTritsAddress(TrinityAddr), banker)
-	s.squad[2] = NewTritsPlayer(NewTritsAddress(AgentAddr), banker)
-	s.squad[3] = NewTritsPlayer(NewTritsAddress(KeymakerAddr), banker)
-	s.squad[4] = NewTritsPlayer(NewTritsAddress(MorpheusAddr), banker)
-	s.squad[5] = NewTritsPlayer(NewTritsAddress(NiobeAddr), banker)
-	s.squad[6] = NewTritsPlayer(NewTritsAddress(OracleAddr), banker)
-	s.squad[7] = NewTritsPlayer(NewTritsAddress(PersephoneAddr), banker)
-	s.squad[8] = NewTritsPlayer(NewTritsAddress(TwinsAddr), banker)
-	s.squad[9] = NewTritsPlayer(NewTritsAddress(BugsAddr), banker)
-	s.squad[10] = NewTritsPlayer(NewTritsAddress(BugsAddr), banker)
-	s.squad[11] = NewTritsPlayer(NewTritsAddress(AnalystAddr), banker)
-	s.squad[12] = NewTritsPlayer(NewTritsAddress(SeraphAddr), banker)
-	s.squad[13] = NewTritsPlayer(NewTritsAddress(ArchitectAddr), banker)
+	var all [14]*TritsPlayer
+	all[0] = NewTritsPlayerFactory(NewTritsAddress(NeoAddr), banker,"dumb")
+	all[1] = NewTritsPlayerFactory(NewTritsAddress(TrinityAddr), banker,"dumb")
+	all[2] = NewTritsPlayerFactory(NewTritsAddress(AgentAddr), banker,"dumb")
+	all[3] = NewTritsPlayerFactory(NewTritsAddress(KeymakerAddr), banker,"dumb")
+	all[4] = NewTritsPlayerFactory(NewTritsAddress(MorpheusAddr), banker,"dumb")
+	all[5] = NewTritsPlayerFactory(NewTritsAddress(NiobeAddr), banker,"dumb")
+	all[6] = NewTritsPlayerFactory(NewTritsAddress(OracleAddr), banker,"dumb")
+	all[7] = NewTritsPlayerFactory(NewTritsAddress(PersephoneAddr), banker,"dumb")
+	all[8] = NewTritsPlayerFactory(NewTritsAddress(TwinsAddr), banker,"dumb")
+	all[9] = NewTritsPlayerFactory(NewTritsAddress(BugsAddr), banker,"dumb")
+	all[10] = NewTritsPlayerFactory(NewTritsAddress(AnalystAddr), banker,"dumb")
+	all[11] = NewTritsPlayerFactory(NewTritsAddress(SeraphAddr), banker,"dumb")
+	all[12] = NewTritsPlayerFactory(NewTritsAddress(ArchitectAddr), banker,"dumb")
+	all[13] = NewTritsPlayerFactory(NewTritsAddress(BaneAddr), banker,"dumb")
+	s.squad = all[0:PLAYERS_IN_SQUAD]
 	return s
 }
 

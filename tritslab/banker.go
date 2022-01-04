@@ -49,7 +49,7 @@ func (b *TritsBanker) MoveFunds(from *TritsAddress, to *TritsAddress, amount uin
 		return false, "Sender " + from.Human() + " doesn't exist"
 	} else {
 		if b.bank[f] < amount {
-			return false, "Insufficient funds, sender " + from.Human() + " has got " + fmt.Sprint(b.bank[f]) + " only"
+			return false, "Sender " + from.Human() + " has got " + fmt.Sprint(b.bank[f]) + " only, req " + fmt.Sprint(amount)
 		}
 	}
 	if _, ok := b.bank[t]; !ok { // Create a new account if it doesn't exist
@@ -61,4 +61,29 @@ func (b *TritsBanker) MoveFunds(from *TritsAddress, to *TritsAddress, amount uin
 	b.bank[t] += amount
 	b.healthcheck()
 	return true, "OK, moved " + fmt.Sprint(amount) + " from sender " + from.Human() + " to " + to.Human()
+}
+
+// Determines bonus, moves funds to the game and tell croupier how much for the PlaceCoin
+func (b *TritsBanker) PutBonus(game *TritsGame) uint64 {
+	in_bank := b.Tell(NewTritsAddress(BankAddr))
+	var bonus uint64 = 0
+	if game.Nominal*4 > in_bank { // Can't give any bonus
+		return 0
+	}
+	if game.Nominal*5 > in_bank {
+		bonus = game.Nominal * 4
+		b.MoveFunds(NewTritsAddress(BankAddr), game.ThisGame, bonus)
+		return bonus
+	}
+	// 4 or 5, THAT is THE question
+	r := RandByte() % 100
+
+	if r >= BONUS_TRESHOLD {
+		bonus = 5 * game.Nominal
+	} else {
+		bonus = 4 * game.Nominal
+	}
+	b.MoveFunds(NewTritsAddress(BankAddr), game.ThisGame, bonus)
+	//TODO: check if the money has really moved
+	return bonus
 }
