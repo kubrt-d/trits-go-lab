@@ -30,7 +30,7 @@ func TestTritsAddress_Raw(t *testing.T) {
 		var x string = "e28533750bee16842a5cd4f533d235770e407367"
 		a := NewTritsAddress(valid)
 		got := a.SameAs(x)
-		if got {
+		if !got {
 			t.Errorf("TritsTriangle.SameAs() = %v, want %v", got, true)
 		}
 	})

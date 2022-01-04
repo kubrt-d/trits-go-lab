@@ -1,9 +1,5 @@
 package tritslab
 
-import (
-	"crypto/rand"
-)
-
 /* Used for generating random throws of a three-sided dice */
 
 type Random3Dice interface {
@@ -19,9 +15,6 @@ func NewTritsDice() *TritsDice {
 }
 
 func (s *TritsDice) Throw3Dice() int8 {
-	b := []byte{0}
-	if _, err := rand.Reader.Read(b); err != nil {
-		panic(err)
-	}
-	return int8(b[0]%3 + 1)
+	b := RandByte()
+	return int8(b%3 + 1)
 }
