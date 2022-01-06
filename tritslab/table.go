@@ -83,12 +83,15 @@ func (t *TritsTable) GetCityAddress(index int) *TritsAddress {
 	}
 }
 
-/*
-func (t *TritsTable) GetCityNameForAddress (addr *TritsAddress) {
+// Human readable game names fo logging purposes
+func GameName(a *TritsAddress) string {
+	t := new(TritsTable)
 	var i int = 0
 	for i < GAMES_ON_TABLE {
-
+		if a.Equals(t.GetCityAddress(i)) {
+			return t.GetCityName(i)
+		}
+		i++
 	}
-	i++
+	return a.Human()
 }
-*/

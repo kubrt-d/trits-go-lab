@@ -7,11 +7,13 @@ import (
 type TritsBanker struct {
 	bank         map[string]uint64 // Bank is a map of account addresses and their current balances
 	started_with uint64
+	treshold byte
 }
 
-func NewTritsBanker(start_with uint64) *TritsBanker {
+func NewTritsBanker(start_with uint64, treshold byte) *TritsBanker {
 	banker := new(TritsBanker)
 	banker.started_with = start_with
+	banker.treshold = treshold
 	banker.bank = make(map[string]uint64)
 	banker.bank[BankAddr] = start_with
 	return banker
@@ -30,6 +32,17 @@ func (b *TritsBanker) healthcheck() bool {
 	}
 }
 
+func (b *TritsBanker) gamehealthcheck(game *TritsGame) bool {
+	should_have := uint64(game.Middle + uint32(len(game.Trit.V1)+len(game.Trit.V2)+len(game.Trit.V3)))
+	has := b.Tell(game.ThisGame)
+	if should_have != has {
+		l(LOG_PANIC, "Wrong game balance ", game.ThisGame.Human(), " has ", has, ", while it should have ", should_have, ".Exiting!")
+	} else {
+		return true
+	}
+	return false
+}
+
 // Tell balance for address
 func (b *TritsBanker) Tell(who *TritsAddress) uint64 {
 	w := who.Raw()
@@ -46,10 +59,10 @@ func (b *TritsBanker) MoveFunds(from *TritsAddress, to *TritsAddress, amount uin
 	f := from.Raw()
 	t := to.Raw()
 	if _, ok := b.bank[f]; !ok {
-		return false, "Sender " + from.Human() + " doesn't exist"
+		return false, "Sender " + LogName(from) + " doesn't exist"
 	} else {
 		if b.bank[f] < amount {
-			return false, "Sender " + from.Human() + " has got " + fmt.Sprint(b.bank[f]) + " only, req " + fmt.Sprint(amount)
+			return false, "Sender " + LogName(from) + " has got " + fmt.Sprint(b.bank[f]) + " only, reqesting " + fmt.Sprint(amount)
 		}
 	}
 	if _, ok := b.bank[t]; !ok { // Create a new account if it doesn't exist
@@ -78,7 +91,7 @@ func (b *TritsBanker) PutBonus(game *TritsGame) uint64 {
 	// 4 or 5, THAT is THE question
 	r := RandByte() % 100
 
-	if r >= BONUS_TRESHOLD {
+	if r >= byte(b.treshold) {
 		bonus = 5 * game.Nominal
 	} else {
 		bonus = 4 * game.Nominal
@@ -86,4 +99,15 @@ func (b *TritsBanker) PutBonus(game *TritsGame) uint64 {
 	b.MoveFunds(NewTritsAddress(BankAddr), game.ThisGame, bonus)
 	//TODO: check if the money has really moved
 	return bonus
+}
+
+// Dump all balances for logging purposes
+func (b *TritsBanker) DumpBank() string {
+	// TODO: Sort them alphabetically
+
+	var out string = ""
+	for addr, balance := range b.bank {
+		out = out + LogName(NewTritsAddress(addr)) + ":" + fmt.Sprint(balance) + " "
+	}
+	return out
 }

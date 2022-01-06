@@ -4,14 +4,14 @@ import "testing"
 
 func TestTritsBanker_MoveFunds(t *testing.T) {
 	t.Run("Test banker constructor", func(t *testing.T) {
-		b := NewTritsBanker(1000)
+		b := NewTritsBanker(1000,50)
 		got := b.Tell(NewTritsAddress(BankAddr))
 		if got != 1000 {
 			t.Errorf("TritsBanker.NewTritsBanker() got = %v, want %v", got, 1000)
 		}
 	})
 	t.Run("Test banker move funds", func(t *testing.T) {
-		b := NewTritsBanker(1000)
+		b := NewTritsBanker(1000,50)
 		bank := NewTritsAddress(BankAddr)
 		neo := NewTritsAddress(NeoAddr)
 		got, got1 := b.MoveFunds(bank, neo, 300)
@@ -20,7 +20,7 @@ func TestTritsBanker_MoveFunds(t *testing.T) {
 		}
 	})
 	t.Run("Test banker checks", func(t *testing.T) {
-		b := NewTritsBanker(1000)
+		b := NewTritsBanker(1000,50)
 		bank := NewTritsAddress(BankAddr)
 		neo := NewTritsAddress(NeoAddr)
 		agent := NewTritsAddress(AgentAddr)
@@ -34,7 +34,7 @@ func TestTritsBanker_MoveFunds(t *testing.T) {
 	})
 
 	t.Run("Test sender doesn't exist", func(t *testing.T) {
-		b := NewTritsBanker(0)
+		b := NewTritsBanker(0,50)
 		neo := NewTritsAddress(NeoAddr)
 		agent := NewTritsAddress(AgentAddr)
 		got, got1 := b.MoveFunds(neo, agent, 1)
@@ -44,7 +44,7 @@ func TestTritsBanker_MoveFunds(t *testing.T) {
 	})
 
 	t.Run("Test banker tell", func(t *testing.T) {
-		b := NewTritsBanker(uint64(500000000000000000))
+		b := NewTritsBanker(uint64(500000000000000000),50)
 		bank := NewTritsAddress(BankAddr)
 		neo := NewTritsAddress(NeoAddr)
 		b.MoveFunds(bank, neo, 400000000000000000)

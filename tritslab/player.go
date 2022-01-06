@@ -47,10 +47,15 @@ func (p *TritsPlayer) ChooseTable() int8 {
 
 // Choose amount
 func (p *TritsPlayer) ChooseAmount() uint64 {
-	b := RandByte()
 	pocket := p.Balance()
-	percent := int8(b%10 + 1) // Bet no more between 1 - 10 percent of the pocket
-	return uint64(math.Round(float64(percent) / 100 * float64(pocket)))
+	if NOMINAL > 0 && NOMINAL < pocket {
+		return NOMINAL
+	} else {
+		b := RandByte()
+		pocket := p.Balance()
+		percent := int8(b%10 + 1) // Bet no more between 1 - 10 percent of the pocket
+		return uint64(math.Round(float64(percent) / 100 * float64(pocket)))
+	}
 }
 
 func (p *TritsPlayer) Balance() uint64 {
@@ -72,33 +77,105 @@ func (p *TritsPlayer) Bet(desk []*TritsGame) []*TritsPlayerResponse {
 	}
 	if i < GAMES_ON_TABLE { // Found an uninitiated game
 		amount := p.ChooseAmount()
+		if amount == 0 { // This guy is out of money
+			if TD {
+				l(LOG_NOTICE, LogName(p.Addr), " is broke !")
+			}
+		}
 		res := NewTritsPlayerResponse(desk[i], amount, p.Addr)
 		responses = append(responses, res)
+		if TD {
+			l(LOG_NOTICE, LogName(p.Addr), " decides to init new game ", LogName(desk[i].ThisGame), ", with ", amount)
+		}
 		return responses
 	}
 
 	// No uninitiated game found, try to find the inbalance of 2 which I can afford
 	var j int = 0
-	for j < GAMES_ON_TABLE && desk[j].GetInbalance() != 2 && desk[j].Nominal < pocket {
+	for j < GAMES_ON_TABLE { // Loop through all games
+		if (desk[j].GetInbalance() == 2) && (desk[j].Nominal < pocket) {
+			break // If inbalance is 2 and the player can afford it
+		}
 		j++
 	}
 	if j < GAMES_ON_TABLE { // Found a good inbalance, bet
 		res := NewTritsPlayerResponse(desk[j], desk[j].Nominal, p.Addr)
 		responses = append(responses, res)
+		if TD {
+			l(LOG_NOTICE, LogName(p.Addr), " has ", pocket, " and finds inbalance 2 ", LogName(desk[j].ThisGame), ", nominal ", desk[j].Nominal)
+		}
 		return responses
 	}
 
 	// No good inbalance found, bet on the first one I can afford
 	var k int = 0
-	for k < GAMES_ON_TABLE && desk[k].Nominal > pocket {
+	for k < GAMES_ON_TABLE {
+		if desk[k].Nominal < pocket {
+			break
+		}
 		k++
 	}
-	if k < GAMES_ON_TABLE { // Found something
+	if k < GAMES_ON_TABLE { // Found something to bet on
 		res := NewTritsPlayerResponse(desk[k], desk[k].Nominal, p.Addr)
 		responses = append(responses, res)
+		if TD {
+			l(LOG_NOTICE, LogName(p.Addr), " has ", pocket, " and decides to play on ", LogName(desk[k].ThisGame), ", with ", desk[k].Nominal)
+		}
 		return responses
 	}
 
+	if TD {
+		l(LOG_NOTICE, LogName(p.Addr), " has got ", pocket, " only and can't afford any game")
+	}
 	// I seem to be out of game
 	return nil
+}
+
+// Human name for logging
+func (p *TritsPlayer) Name() string {
+	var name string = ""
+	switch p.Addr.Raw() {
+	case NoAddr:
+		name = "Null"
+	case BankAddr:
+		name = "Bank"
+	case NeoAddr:
+		name = "Neo"
+	case TrinityAddr:
+		name = "Trinity"
+	case AgentAddr:
+		name = "Agent"
+	case KeymakerAddr:
+		name = "Keymaker"
+	case MorpheusAddr:
+		name = "Morheus"
+	case NiobeAddr:
+		name = "Niobe"
+	case OracleAddr:
+		name = "Oracle"
+	case PersephoneAddr:
+		name = "Persephone"
+	case TwinsAddr:
+		name = "Twins"
+	case BugsAddr:
+		name = "Bugs"
+	case AnalystAddr:
+		name = "Analyst"
+	case SeraphAddr:
+		name = "Seraph"
+	case ArchitectAddr:
+		name = "Architect"
+	case BaneAddr:
+		name = "Bane"
+	default:
+		name = p.Addr.Human()
+	}
+	return name
+}
+
+// Helper function to get player name by address statically
+func PlayerName(addr *TritsAddress) string {
+	b := NewTritsBanker(0, 0)
+	p := NewTritsPlayer(addr, b)
+	return p.Name()
 }
