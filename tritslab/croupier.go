@@ -15,8 +15,8 @@ func NewTritsCroupier(lot uint64, bank_start uint64, treshold byte) *TritsCroupi
 		lot = lot - 1
 	}
 	bank := NewTritsAddress(BankAddr)
-	croupier := new(TritsCroupier)                     // Wash your hands
-	croupier.Banker = NewTritsBanker(lot + bank_start, treshold) // Hire a banker and put everything in the bank
+	croupier := new(TritsCroupier)                             // Wash your hands
+	croupier.Banker = NewTritsBanker(lot+bank_start, treshold) // Hire a banker and put everything in the bank
 	if TD {
 		l(LOG_INFO, "CROUPIER invites BANKER and creates a bank account with ", lot+bank_start)
 	}
@@ -54,6 +54,7 @@ func (c *TritsCroupier) AskAround() {
 	var i int = 0
 	for i < num_players {
 		if TD {
+			c.Banker.gamehealthcheck(c.Table.desk[0])
 			l(LOG_DEBUG, "CROUPIER asks ", c.Players.squad[i].Name(), " to play...")
 		}
 		player_responses := c.Players.squad[i].Bet(c.Table.desk)
@@ -83,32 +84,33 @@ func (c *TritsCroupier) AskAround() {
 					switch do.Action {
 					case ACTION_TRANSFER:
 						if TD {
-							l(LOG_DEBUG, "CROUPIER has got to deal with ACTION_TRANSFER")
+							l(LOG_DEBUG, "CROUPIER passes ACTION_TRANSFER to the BANKER")
 						}
 						if ok, err := c.Banker.MoveFunds(do.Funds_from, do.Funds_to, do.Amount); !ok {
 							panic(err)
 						} else {
-							if TD {
-								l(LOG_INFO, "BANKER sends ", do.Amount, " from ", LogName(do.Funds_from), " to ", LogName(do.Funds_to))
-								l(LOG_DEBUG, "GAME: ", lgame(r.Game))
-								l(LOG_DEBUG, "BANK: ", c.Banker.DumpBank())
-							}
+							/*
+								if TD {
+									l(LOG_INFO, "BANKER sends ", do.Amount, " from ", LogName(do.Funds_from), " to ", LogName(do.Funds_to))
+									l(LOG_DEBUG, "GAME: ", lgame(r.Game))
+									l(LOG_DEBUG, "BANK: ", c.Banker.DumpBank())
+								}
+							*/
 						}
 					case ACTION_ASK_BONUS:
 						if TD {
-							l(LOG_DEBUG, "CROUPIER has got to deal with ACTION_ASK_BONUS")
+							l(LOG_DEBUG, "CROUPIER passes ACTION_ASK_BONUS to the BANKER")
 						}
 						bonus := c.Banker.PutBonus(r.Game)
 						if bonus > 0 {
 							r.Game.PlaceCoin(NewTritsAddress(BankAddr), bonus)
 							if TD {
-								l(LOG_DEBUG, "BANKER sends bonus ", bonus, " to ", GameName(r.Game.ThisGame))
+								l(LOG_DEBUG, "GAME: ", GameName(r.Game.ThisGame), "received the bonus")
 								l(LOG_DEBUG, "GAME: ", lgame(r.Game))
-								l(LOG_DEBUG, "BANK: ", c.Banker.DumpBank())
 							}
 						} else {
 							if TD {
-								l(LOG_DEBUG, "BANKER decided not to put any bonus to ", GameName(r.Game.ThisGame))
+								l(LOG_DEBUG, "BANK can't afford to put any bonus to ", GameName(r.Game.ThisGame))
 								l(LOG_DEBUG, "GAME: ", lgame(r.Game))
 							}
 						}

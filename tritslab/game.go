@@ -37,6 +37,8 @@ type TritsGame struct {
 func (game *TritsGame) ResetGame() {
 	game.Trit = NewTritsTriangle()
 	game.Nominal = 0
+	game.Middle = 0
+	game.Owner = nil
 	game.updated = time.Now().UnixNano()
 }
 
@@ -54,6 +56,10 @@ func (game *TritsGame) PlaceCoin(from *TritsAddress, amount uint64) []*TritsGame
 
 	var responses []*TritsGameResponse
 	response := NewGameResponse() // Default response is
+	// NON ZERO POSITIVE AMOUNTS ONLY
+	if amount <= 0 {
+		return nil // Nothing happens
+	}
 
 	// EXPIRE GAME
 	if time.Now().UnixNano() > game.updated+game.ll {
@@ -154,17 +160,26 @@ func (game *TritsGame) PlaceCoin(from *TritsAddress, amount uint64) []*TritsGame
 			}
 			evil := game.rand.Throw3Dice() // Randomly choose the evil arm
 			if TD {
-				l(LOG_DEBUG, "GAME: ", LogName(game.ThisGame), " the evil arm's number is ", evil)
+				l(LOG_DEBUG, "GAME: ", LogName(game.ThisGame), " the evil arm number is ", evil)
 			}
 			if destiny == evil { // Ouch, you hit the bank's arm
 				if TD {
 					l(LOG_DEBUG, "GAME: ", LogName(game.ThisGame), " bad luck, hit the banks arm. ", game.GetTotal(), " goes to the bank.")
 				}
-				response.Funds_from = game.ThisGame           // From this game
-				response.Funds_to = NewTritsAddress(BankAddr) // To the bank
-				response.Amount = game.GetTotal()             // Bank takes it all
-				responses = append(responses, response)       // Add the response
-				game.ResetGame()                              // Reset game
+
+				response0 := NewGameResponse()
+				response0.Funds_from = game.ThisGame     // From this game
+				response0.Funds_to = game.Owner          // To the game owner
+				response0.Amount = game.Nominal          // 1 coin
+				game.Middle--                            // From the middle (which should be 0 after this)
+				responses = append(responses, response0) // Add the response
+
+				response1 := NewGameResponse()
+				response1.Funds_from = game.ThisGame           // From this game
+				response1.Funds_to = NewTritsAddress(BankAddr) // To the bank
+				response1.Amount = game.GetTotal()             // Bank takes it all
+				responses = append(responses, response1)       // Add the response
+				game.ResetGame()                               // Reset game
 				return responses
 			} else { // Hooray, you deserve it, what a game !
 				game_total := game.GetTotal()
@@ -173,7 +188,7 @@ func (game *TritsGame) PlaceCoin(from *TritsAddress, amount uint64) []*TritsGame
 				if game_total%game_nominal != 0 {
 					panic("Something went terribly wrong with the game total versus nominal")
 				}
-				if game.Owner.Equals(from) { // Game owner and the winner are the same, send it in one go
+				if game.Owner.Equals(from) { // Game owner and the winner are the same, send it all in one go
 					if TD {
 						l(LOG_DEBUG, "GAME: ", LogName(game.ThisGame), " winner same as owner, sending ", game_total, " to ", LogName(from))
 					}
@@ -192,17 +207,29 @@ func (game *TritsGame) PlaceCoin(from *TritsAddress, amount uint64) []*TritsGame
 						response0.Funds_from = game.ThisGame     // From this game
 						response0.Funds_to = game.Owner          // To the game owner
 						response0.Amount = game_tripple          // All except the owner's reward
-						game.Middle -= 3                         // Lower the total
+						game_total -= game_tripple               // Lower the total
+						game.Middle -= 3                         // Lower the middle counter
+						responses = append(responses, response0) // Add the response
+					} else { // Game without bonus
+						if TD {
+							l(LOG_DEBUG, "GAME: ", LogName(game.ThisGame), " the 1 middle coin back the owner, sending ", game.Nominal, " to ", LogName(game.Owner))
+						}
+						response0 := NewGameResponse()           // Reward the game owner
+						response0.Funds_from = game.ThisGame     // From this game
+						response0.Funds_to = game.Owner          // To the game owner
+						response0.Amount = game.Nominal          // All except the owner's reward
+						game_total -= game.Nominal               // Lower the total
+						game.Middle -= 1                         // Lower the middle couter
 						responses = append(responses, response0) // Add the response
 					}
 					if TD {
 						l(LOG_DEBUG, "GAME: ", LogName(game.ThisGame), " rewarding the winner, sending ", game_total-game_tripple, " to ", LogName(from))
 					}
-					response1 := NewGameResponse()               // Send money to the winner
-					response1.Funds_from = game.ThisGame         // From this game
-					response1.Funds_to = from                    // To the winner
-					response1.Amount = game_total - game_tripple // All except the owner's reward
-					responses = append(responses, response1)     // Add the response
+					response1 := NewGameResponse()           // Send (the rest) of the money to the winner
+					response1.Funds_from = game.ThisGame     // From this game
+					response1.Funds_to = from                // To the winner
+					response1.Amount = game_total            // All except the owner's reward
+					responses = append(responses, response1) // Add the response
 					game.ResetGame()
 					return responses
 				}

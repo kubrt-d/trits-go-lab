@@ -30,10 +30,11 @@ func TestTritsCroupier_AskAround(t *testing.T) {
 		c := NewTritsCroupier(1000000, 50000, 50)
 		c.AskAround()
 		var j = 0
-		for j < 200000 {
+		for j < 2000 {
 			c.AskAround()
 			j++
 		}
+		c.AskAround()
 		res := c.Banker.DumpBank()
 		fmt.Println(res)
 	})

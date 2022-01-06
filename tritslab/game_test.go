@@ -65,14 +65,9 @@ func TestTritsGame_PlaceCoin(t *testing.T) {
 	t.Run("Bank sends 0", func(t *testing.T) {
 		res := game.PlaceCoin(bank_addr, 0)
 
-		response := res[0]
-
-		assert := NewGameResponse()
-		assert.Action = ACTION_TRANSFER
-		assert.Amount = 0
-		assert.Funds_from = game_addr
-		assert.Funds_to = NewTritsAddress(BankAddr)
-		test(t, response, assert)
+		if res != nil {
+			t.Errorf("TritsGame.PlaceCoin().PlaceCoin = %v, want %v", "some response", nil)
+		}
 	})
 	// NEO STARTS THE GAME
 	t.Run("Neo sends 300 and starts the game", func(t *testing.T) {
@@ -236,23 +231,28 @@ func TestTritsGame_PlaceCoin(t *testing.T) {
 		}
 	})
 	// Reward the owner
+	//TODO: Re write this test to take into teh acccount that Neo may not win
 	random_dice := NewTritsDice()
-	random_game := NewTritsGame(game_addr, 60000000000, random_dice)
-	t.Run("Trinity starts then gets a reward from a random game", func(t *testing.T) {
-		random_game.PlaceCoin(trinity_addr, 1)
-		random_game.PlaceCoin(bank_addr, 4)
-		var last_responses []*TritsGameResponse
-		for random_game.Nominal != 0 { // Neo play random until he wins eventually
-			last_responses = random_game.PlaceCoin(neo_addr, 1)
-		}
-		res0 := last_responses[0]
-		assert0 := NewGameResponse()
-		assert0.Action = ACTION_TRANSFER
-		assert0.Funds_from = game_addr
-		assert0.Funds_to = trinity_addr
-		assert0.Amount = 3
-		test(t, res0, assert0)
-	})
+	/*
+		random_game := NewTritsGame(game_addr, 60000000000, random_dice)
+		t.Run("Trinity starts then gets a reward from a random game", func(t *testing.T) {
+			random_game.PlaceCoin(trinity_addr, 1)
+			random_game.PlaceCoin(bank_addr, 4)
+			var last_responses []*TritsGameResponse
+			for random_game.Nominal != 0 { // Neo play random until he wins eventually
+				last_responses = random_game.PlaceCoin(neo_addr, 1)
+			}
+			res0 := last_responses[0]
+			assert0 := NewGameResponse()
+			assert0.Action = ACTION_TRANSFER
+			assert0.Funds_from = game_addr
+			assert0.Funds_to = trinity_addr
+			assert0.Amount = 3
+			test(t, res0, assert0)
+		})
+	*/
+	// Reward the owner against the evil
+	//TODO: Write this test
 	// Test expiration (0.1s)
 	t.Run("Test expiration", func(t *testing.T) {
 		ephemeral_game := NewTritsGame(game_addr, 1000000, random_dice)

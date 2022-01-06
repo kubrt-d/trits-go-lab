@@ -81,6 +81,7 @@ func (p *TritsPlayer) Bet(desk []*TritsGame) []*TritsPlayerResponse {
 			if TD {
 				l(LOG_NOTICE, LogName(p.Addr), " is broke !")
 			}
+			return nil
 		}
 		res := NewTritsPlayerResponse(desk[i], amount, p.Addr)
 		responses = append(responses, res)

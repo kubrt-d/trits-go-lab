@@ -7,7 +7,7 @@ import (
 type TritsBanker struct {
 	bank         map[string]uint64 // Bank is a map of account addresses and their current balances
 	started_with uint64
-	treshold byte
+	treshold     byte
 }
 
 func NewTritsBanker(start_with uint64, treshold byte) *TritsBanker {
@@ -35,8 +35,9 @@ func (b *TritsBanker) healthcheck() bool {
 func (b *TritsBanker) gamehealthcheck(game *TritsGame) bool {
 	should_have := uint64(game.Middle + uint32(len(game.Trit.V1)+len(game.Trit.V2)+len(game.Trit.V3)))
 	has := b.Tell(game.ThisGame)
-	if should_have != has {
+	if should_have != has || has > 100 {
 		l(LOG_PANIC, "Wrong game balance ", game.ThisGame.Human(), " has ", has, ", while it should have ", should_have, ".Exiting!")
+		panic("Here we go")
 	} else {
 		return true
 	}
@@ -70,9 +71,17 @@ func (b *TritsBanker) MoveFunds(from *TritsAddress, to *TritsAddress, amount uin
 	}
 
 	// Move the funds
+	if TD {
+		l(LOG_INFO, "BANKER is about to move ", amount, " from ", LogName(from), " to ", LogName(to))
+		l(LOG_DEBUG, "BANK before: ", b.DumpBank())
+	}
 	b.bank[f] -= amount
 	b.bank[t] += amount
 	b.healthcheck()
+	if TD {
+		l(LOG_DEBUG, "BANK after: ", b.DumpBank())
+	}
+
 	return true, "OK, moved " + fmt.Sprint(amount) + " from sender " + from.Human() + " to " + to.Human()
 }
 
@@ -80,21 +89,27 @@ func (b *TritsBanker) MoveFunds(from *TritsAddress, to *TritsAddress, amount uin
 func (b *TritsBanker) PutBonus(game *TritsGame) uint64 {
 	in_bank := b.Tell(NewTritsAddress(BankAddr))
 	var bonus uint64 = 0
-	if game.Nominal*4 > in_bank { // Can't give any bonus
+	if game.Nominal*BONUS_LOW > in_bank { // Can't give any bonus
 		return 0
 	}
-	if game.Nominal*5 > in_bank {
-		bonus = game.Nominal * 4
+	if game.Nominal*BONUS_HIGH > in_bank { // Can only afford BONUS_LOW
+		bonus = game.Nominal * BONUS_LOW
 		b.MoveFunds(NewTritsAddress(BankAddr), game.ThisGame, bonus)
 		return bonus
 	}
-	// 4 or 5, THAT is THE question
+	// BONUS_LOW or BONUS_HIGH, THAT is THE question
 	r := RandByte() % 100
 
-	if r >= byte(b.treshold) {
-		bonus = 5 * game.Nominal
-	} else {
-		bonus = 4 * game.Nominal
+	if r >= byte(b.treshold) { // Above treshold, giving BONUS_HIGH
+		bonus = BONUS_HIGH * game.Nominal
+		if TD {
+			l(LOG_WARN, "Bonus ", BONUS_HIGH)
+		}
+	} else { // Below treshold, giving BONUS_LOW
+		bonus = BONUS_LOW * game.Nominal
+		if TD {
+			l(LOG_WARN, "Bonus ", BONUS_LOW)
+		}
 	}
 	b.MoveFunds(NewTritsAddress(BankAddr), game.ThisGame, bonus)
 	//TODO: check if the money has really moved
