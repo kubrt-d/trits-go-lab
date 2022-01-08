@@ -1,10 +1,10 @@
 package tritslab
 
-const TD = false // Trits debug on/off
+const TD = true // Trits debug on/off
 
-const NOMINAL = 1          // Nominal, if set to 0 then nominal is random 1-10 % of the pocket
-const GAMES_ON_TABLE = 1   // Max 23
-const PLAYERS_IN_SQUAD = 1 // Max 14
+const NOMINAL = 0           // Nominal, if set to 0 then nominal is random 1-10 % of the pocket
+const GAMES_ON_TABLE = 23   // Max 23
+const PLAYERS_IN_SQUAD = 10 // Max 14
 const BONUS_LOW = 3
-const BONUS_HIGH = 4
+const BONUS_HIGH = 3
 const LOG_LEVEL = LOG_DEBUG // LOG_DEBUG<LOG_INFO < LOG_NOT

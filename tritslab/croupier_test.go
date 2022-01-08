@@ -8,7 +8,7 @@ import (
 func TestTritsCroupier_Constructor(t *testing.T) {
 	t.Run("Test croupier constructor", func(t *testing.T) {
 		c := NewTritsCroupier(1000000, 50000, 50)
-		games := len(c.Table.desk)
+		games := len(c.Table.Desk)
 		if games != GAMES_ON_TABLE {
 			t.Errorf("TritsCroupier.NewTritsCroupier().table.desk got = %v, want %v", games, GAMES_ON_TABLE)
 		}

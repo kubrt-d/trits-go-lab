@@ -54,10 +54,10 @@ func (c *TritsCroupier) AskAround() {
 	var i int = 0
 	for i < num_players {
 		if TD {
-			c.Banker.gamehealthcheck(c.Table.desk[0])
+			c.Banker.gameshealthcheck(c.Table.Desk)
 			l(LOG_DEBUG, "CROUPIER asks ", c.Players.squad[i].Name(), " to play...")
 		}
-		player_responses := c.Players.squad[i].Bet(c.Table.desk)
+		player_responses := c.Players.squad[i].Bet(c.Table.Desk)
 		for _, r := range player_responses {
 			// Place bet as instructed
 			if TD {
@@ -73,7 +73,7 @@ func (c *TritsCroupier) AskAround() {
 				if len(todos) == 0 {
 					if TD {
 						l(LOG_DEBUG, "CROUPIER has got nothing to do")
-						l(LOG_DEBUG, "GAME: ", lgame(r.Game))
+						l(LOG_DEBUG, "GAME: ", LGame(r.Game))
 						l(LOG_DEBUG, "BANK: ", c.Banker.DumpBank())
 					}
 				}
@@ -88,14 +88,6 @@ func (c *TritsCroupier) AskAround() {
 						}
 						if ok, err := c.Banker.MoveFunds(do.Funds_from, do.Funds_to, do.Amount); !ok {
 							panic(err)
-						} else {
-							/*
-								if TD {
-									l(LOG_INFO, "BANKER sends ", do.Amount, " from ", LogName(do.Funds_from), " to ", LogName(do.Funds_to))
-									l(LOG_DEBUG, "GAME: ", lgame(r.Game))
-									l(LOG_DEBUG, "BANK: ", c.Banker.DumpBank())
-								}
-							*/
 						}
 					case ACTION_ASK_BONUS:
 						if TD {
@@ -105,13 +97,13 @@ func (c *TritsCroupier) AskAround() {
 						if bonus > 0 {
 							r.Game.PlaceCoin(NewTritsAddress(BankAddr), bonus)
 							if TD {
-								l(LOG_DEBUG, "GAME: ", GameName(r.Game.ThisGame), "received the bonus")
-								l(LOG_DEBUG, "GAME: ", lgame(r.Game))
+								l(LOG_DEBUG, "GAME: ", GameName(r.Game.ThisGame), " received the bonus")
+								l(LOG_DEBUG, "GAME: ", LGame(r.Game))
 							}
 						} else {
 							if TD {
 								l(LOG_DEBUG, "BANK can't afford to put any bonus to ", GameName(r.Game.ThisGame))
-								l(LOG_DEBUG, "GAME: ", lgame(r.Game))
+								l(LOG_DEBUG, "GAME: ", LGame(r.Game))
 							}
 						}
 					}

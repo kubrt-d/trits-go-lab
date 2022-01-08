@@ -53,7 +53,7 @@ func (p *TritsPlayer) ChooseAmount() uint64 {
 	} else {
 		b := RandByte()
 		pocket := p.Balance()
-		percent := int8(b%10 + 1) // Bet no more between 1 - 10 percent of the pocket
+		percent := int8(b%5 + 1) // Bet no more between 1 - 5 percent of the pocket
 		return uint64(math.Round(float64(percent) / 100 * float64(pocket)))
 	}
 }

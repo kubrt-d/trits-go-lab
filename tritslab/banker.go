@@ -32,16 +32,16 @@ func (b *TritsBanker) healthcheck() bool {
 	}
 }
 
-func (b *TritsBanker) gamehealthcheck(game *TritsGame) bool {
-	should_have := uint64(game.Middle + uint32(len(game.Trit.V1)+len(game.Trit.V2)+len(game.Trit.V3)))
-	has := b.Tell(game.ThisGame)
-	if should_have != has || has > 100 {
-		l(LOG_PANIC, "Wrong game balance ", game.ThisGame.Human(), " has ", has, ", while it should have ", should_have, ".Exiting!")
-		panic("Here we go")
-	} else {
-		return true
+func (b *TritsBanker) gameshealthcheck(games []*TritsGame) bool {
+	for _, game := range games {
+		should_have := game.Nominal * uint64(game.Middle+uint32(len(game.Trit.V1)+len(game.Trit.V2)+len(game.Trit.V3)))
+		has := b.Tell(game.ThisGame)
+		if should_have != has {
+			l(LOG_PANIC, "Wrong game balance ", game.ThisGame.Human(), " has ", has, ", while it should have ", should_have, ".Exiting!")
+			panic("Here we go")
+		}
 	}
-	return false
+	return true
 }
 
 // Tell balance for address
@@ -88,32 +88,37 @@ func (b *TritsBanker) MoveFunds(from *TritsAddress, to *TritsAddress, amount uin
 // Determines bonus, moves funds to the game and tell croupier how much for the PlaceCoin
 func (b *TritsBanker) PutBonus(game *TritsGame) uint64 {
 	in_bank := b.Tell(NewTritsAddress(BankAddr))
-	var bonus uint64 = 0
-	if game.Nominal*BONUS_LOW > in_bank { // Can't give any bonus
+	var bonus byte = 0
+	bonus = 2 + RandByte()%3
+	if game.Nominal*uint64(bonus) > in_bank { // Can't give such bonus
 		return 0
 	}
-	if game.Nominal*BONUS_HIGH > in_bank { // Can only afford BONUS_LOW
-		bonus = game.Nominal * BONUS_LOW
-		b.MoveFunds(NewTritsAddress(BankAddr), game.ThisGame, bonus)
-		return bonus
-	}
-	// BONUS_LOW or BONUS_HIGH, THAT is THE question
-	r := RandByte() % 100
+	bonus_amount := game.Nominal * uint64(bonus)
 
-	if r >= byte(b.treshold) { // Above treshold, giving BONUS_HIGH
-		bonus = BONUS_HIGH * game.Nominal
-		if TD {
-			l(LOG_WARN, "Bonus ", BONUS_HIGH)
+	/*
+		if game.Nominal*BONUS_HIGH > in_bank { // Can only afford BONUS_LOW
+			bonus = game.Nominal * BONUS_LOW
+			b.MoveFunds(NewTritsAddress(BankAddr), game.ThisGame, bonus)
+			return bonus
 		}
-	} else { // Below treshold, giving BONUS_LOW
-		bonus = BONUS_LOW * game.Nominal
-		if TD {
-			l(LOG_WARN, "Bonus ", BONUS_LOW)
+		// BONUS_LOW or BONUS_HIGH, THAT is THE question
+		r := RandByte() % 100
+
+		if r >= byte(b.treshold) { // Above treshold, giving BONUS_HIGH
+			bonus = BONUS_HIGH * game.Nominal
+			if TD {
+				l(LOG_WARN, "Bonus ", BONUS_HIGH)
+			}
+		} else { // Below treshold, giving BONUS_LOW
+			bonus = BONUS_LOW * game.Nominal
+			if TD {
+				l(LOG_WARN, "Bonus ", BONUS_LOW)
+			}
 		}
-	}
-	b.MoveFunds(NewTritsAddress(BankAddr), game.ThisGame, bonus)
+	*/
+	b.MoveFunds(NewTritsAddress(BankAddr), game.ThisGame, bonus_amount)
 	//TODO: check if the money has really moved
-	return bonus
+	return bonus_amount
 }
 
 // Dump all balances for logging purposes

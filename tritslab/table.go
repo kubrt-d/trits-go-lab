@@ -1,7 +1,7 @@
 package tritslab
 
 type TritsTable struct {
-	desk []*TritsGame // Croupier's table
+	Desk []*TritsGame // Croupier's table
 }
 
 func NewTritsTable() *TritsTable {
@@ -10,7 +10,7 @@ func NewTritsTable() *TritsTable {
 	var i int = 0
 	for i < GAMES_ON_TABLE {
 		game := NewTritsGame(t.GetCityAddress(i), TRITS_GAME_LONGEVITY, dice)
-		t.desk = append(t.desk, game)
+		t.Desk = append(t.Desk, game)
 		i++
 	}
 	return t

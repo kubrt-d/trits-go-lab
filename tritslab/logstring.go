@@ -20,7 +20,7 @@ func l(level int8, a ...interface{}) {
 
 // Game status formatter for logging
 // Format: <GameName>: <Middle>(<Nominal>)/(<V1>,<V2>,<V3>)=<Inbalance>
-func lgame(game *TritsGame) string {
+func LGame(game *TritsGame) string {
 
 	//Example: "Kairo: 6(333)/(1,2,4)=2"
 	return fmt.Sprint(GameName(game.ThisGame),
