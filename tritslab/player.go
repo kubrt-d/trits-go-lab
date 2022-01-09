@@ -66,7 +66,7 @@ func (p *TritsPlayer) Balance() uint64 {
 // Borrow money if necessary
 func (p *TritsPlayer) Borrow(max_borrow uint64) uint64 {
 	pocket := p.Balance()
-	if max_borrow > 100*pocket {
+	if max_borrow >= 100*pocket {
 		return max_borrow
 	} else {
 		return 0
@@ -160,7 +160,7 @@ func (p *TritsPlayer) Name() string {
 	case KeymakerAddr:
 		name = "Keymaker"
 	case MorpheusAddr:
-		name = "Morheus"
+		name = "Morpheus"
 	case NiobeAddr:
 		name = "Niobe"
 	case OracleAddr:

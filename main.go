@@ -14,7 +14,7 @@ func main() {
 func playsome() {
 	c := NewTritsCroupier(10000, 1000, 1000)
 	var j = 0
-	for c.AskAround() && j < 2000 {
+	for c.AskAround() && j < 100000 {
 		fmt.Print(j)
 		fmt.Print(",")
 		fmt.Print(c.Banker.Tell(NewTritsAddress(BankAddr)))

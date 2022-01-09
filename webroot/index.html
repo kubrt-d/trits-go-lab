@@ -3,7 +3,6 @@
 <head>
     <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
     <script type="text/javascript">
-        const SAMPLE_RATE = 100
         google.charts.load('current', {
             'packages': ['corechart']
         });
@@ -55,8 +54,9 @@
 
             var headers = lines[0].split(",");
             result.push(headers);
+            sample_rate = Math.floor(lines.length / 250) + 1
             for (var i = 1; i < lines.length - 1; i++) {
-                if (i % SAMPLE_RATE != 0) {
+                if (i % sample_rate != 0) {
                     continue
                 }
                 var arr = [];
@@ -66,7 +66,7 @@
                     if (j > 0) {
                         arr[j] = parseInt(currentline[j]);
                     } else {
-                        arr[j] = currentline[j];
+                        arr[0] = String(currentline[j]);
                     }
                 }
 
