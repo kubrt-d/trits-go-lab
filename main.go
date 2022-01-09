@@ -6,34 +6,29 @@ import (
 )
 
 func main() {
-
-	var t byte = 0
-	for t < 1 {
-		t++
-		playsome(t)
-	}
+	fmt.Print("ROUND,Bank,")
+	LogPlayersHeaders()
+	playsome()
 }
 
-func playsome(t byte) {
-	c := NewTritsCroupier(1000000, 0, t)
+func playsome() {
+	c := NewTritsCroupier(10000, 1000, 1000)
 	var j = 0
-	for j < 10000 {
-		c.AskAround()
-		fmt.Println(c.Banker.Tell(NewTritsAddress(BankAddr)))
-		/*
-			if c.Banker.Tell(NewTritsAddress(NeoAddr)) <= 1 {
-				fmt.Println(fmt.Sprint("Neo broke after ", j, " rounds"))
-				break
-			}
-		*/
+	for c.AskAround() && j < 2000 {
+		fmt.Print(j)
+		fmt.Print(",")
+		fmt.Print(c.Banker.Tell(NewTritsAddress(BankAddr)))
+		fmt.Print(",")
+		LogPlayersBalances(c.Banker)
 		j++
 	}
-	res := c.Banker.Tell(NewTritsAddress(BankAddr))
-	fmt.Println(fmt.Sprint(t, ",", res))
-	fmt.Println(c.Banker.DumpBank())
+	/*
+		res := c.Banker.Tell(NewTritsAddress(BankAddr))
+		fmt.Println(fmt.Sprint(t, ",", res))
+		fmt.Println(c.Banker.DumpBank())
 
-	for _, game := range c.Table.Desk {
-		fmt.Println(LGame(game))
-	}
-
+		for _, game := range c.Table.Desk {
+			fmt.Println(LGame(game))
+		}
+	*/
 }

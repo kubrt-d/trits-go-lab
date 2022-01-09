@@ -43,7 +43,7 @@ func (a *TritsAddress) Raw() string {
 	if a != nil {
 		return a.addr
 	} else {
-		return NoAddr
+		return "n/a"
 	}
 }
 
@@ -52,7 +52,7 @@ func (a *TritsAddress) Human() string {
 	if a != nil {
 		return string(a.addr[32:40])
 	} else {
-		return string(NoAddr[32:40])
+		return "n/a"
 	}
 }
 

@@ -7,15 +7,15 @@ import (
 type TritsBanker struct {
 	bank         map[string]uint64 // Bank is a map of account addresses and their current balances
 	started_with uint64
-	treshold     byte
 }
 
-func NewTritsBanker(start_with uint64, treshold byte) *TritsBanker {
+// Create new trits banker, add start_with to the bank address and WORLDS_Money to the lender's address
+func NewTritsBanker(start_with uint64) *TritsBanker {
 	banker := new(TritsBanker)
 	banker.started_with = start_with
-	banker.treshold = treshold
 	banker.bank = make(map[string]uint64)
 	banker.bank[BankAddr] = start_with
+	banker.bank[LenderAddr] = WORLDS_MONEY
 	return banker
 }
 
@@ -25,7 +25,7 @@ func (b *TritsBanker) healthcheck() bool {
 	for _, balance := range b.bank {
 		sum += balance
 	}
-	if sum != b.started_with {
+	if sum != b.started_with+WORLDS_MONEY {
 		panic("The Bank is leaky or corrupted !")
 	} else {
 		return true

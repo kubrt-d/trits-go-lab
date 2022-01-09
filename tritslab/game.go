@@ -55,7 +55,7 @@ func NewTritsGame(addr *TritsAddress, lifelength int64, rand Random3Dice) *Trits
 func (game *TritsGame) PlaceCoin(from *TritsAddress, amount uint64) []*TritsGameResponse {
 
 	var r []*TritsGameResponse = nil
-	
+
 	// NON ZERO POSITIVE AMOUNTS ONLY
 	if amount <= 0 {
 		return nil // Nothing happens
@@ -72,7 +72,7 @@ func (game *TritsGame) PlaceCoin(from *TritsAddress, amount uint64) []*TritsGame
 				game.ThisGame,             // From this game
 				NewTritsAddress(BankAddr), // The bank takes it all
 				game.GetTotal())           // Refund everything on the table
-				// Add the response and!!! CONTINUE !!!
+			// Add the response and!!! CONTINUE !!!
 		}
 		game.ResetGame()
 	}
@@ -140,7 +140,7 @@ func (game *TritsGame) PlaceCoin(from *TritsAddress, amount uint64) []*TritsGame
 		r = game.addResponse(r, ACTION_ASK_BONUS, // Ask for the bonus
 			NewTritsAddress(BankAddr), // From the bank
 			game.ThisGame,             // To this game
-			0)                         // We don't know how much	
+			0)                         // We don't know how much
 		return r
 	}
 
@@ -164,18 +164,33 @@ func (game *TritsGame) PlaceCoin(from *TritsAddress, amount uint64) []*TritsGame
 			}
 			if destiny == evil { // Ouch, you hit the bank's arm
 				if TD {
-					l(LOG_DEBUG, "GAME: ", LogName(game.ThisGame), " bad luck, hit the banks arm. ", game.GetTotal(), " goes to the bank.")
+					l(LOG_DEBUG, "GAME: ", LogName(game.ThisGame), " bad luck, hit the banks arm. ")
 				}
+				var rew uint32 = 0
+				if game.GetTotal() >= 2*game.Nominal {
+					rew = 2
+					if TD {
+						l(LOG_DEBUG, "GAME: can afford to double the owner's money, ", game.Nominal*uint64(rew), " goes to ", LogName(game.Owner))
+					}
+
+				} else {
+					rew = 1
+					if TD {
+						l(LOG_DEBUG, "GAME: can only affor a money return, ", game.Nominal*uint64(rew), " goes to ", LogName(game.Owner))
+					}
+				}
+				amount_to_owner := game.Nominal * uint64(rew)
+				amount_to_bank := game.GetTotal() - amount_to_owner
 				r = game.addResponse(r, ACTION_TRANSFER,
-					game.ThisGame, // From this game
-					game.Owner,    // To the game owner
-					game.Nominal)  // 1 coinfrom the middle	
-				game.Middle-- // Should be 0 after this
+					game.ThisGame,   // From this game
+					game.Owner,      // To the game owner
+					amount_to_owner) // 1-2  coins from the middle
+				game.Middle -= rew // Should be 0 after this
 
 				r = game.addResponse(r, ACTION_TRANSFER,
 					game.ThisGame,             // From this game
 					NewTritsAddress(BankAddr), // To the bank
-					game.GetTotal())           // Bank takes it all except 1 coin
+					amount_to_bank)            // Bank takes it all except 1-2 coins
 				game.ResetGame() // Reset game
 				return r
 
@@ -191,9 +206,9 @@ func (game *TritsGame) PlaceCoin(from *TritsAddress, amount uint64) []*TritsGame
 						l(LOG_DEBUG, "GAME: ", LogName(game.ThisGame), " winner same as owner, sending ", game_total, " to ", LogName(from))
 					}
 					r = game.addResponse(r, ACTION_TRANSFER,
-					game.ThisGame,     	// From this game
-					from,               // To the winner
-					game_total)         // Everything
+						game.ThisGame, // From this game
+						from,          // To the winner
+						game_total)    // Everything
 					game.ResetGame()
 					return r
 				} else {
@@ -201,30 +216,30 @@ func (game *TritsGame) PlaceCoin(from *TritsAddress, amount uint64) []*TritsGame
 						if TD {
 							l(LOG_DEBUG, "GAME: ", LogName(game.ThisGame), " rewarding the owner, sending ", game_tripple, " to ", LogName(game.Owner))
 						}
-						r = game.addResponse(r, ACTION_TRANSFER,	// Reward the game owner
-						game.ThisGame,     // From this game
-						game.Owner,        // To the game owner
-						game_tripple)      // All except the owner's reward
-						game_total -= game_tripple               // Lower the total
-						game.Middle -= 3                         // Lower the middle counter
+						r = game.addResponse(r, ACTION_TRANSFER, // Reward the game owner
+							game.ThisGame, // From this game
+							game.Owner,    // To the game owner
+							game_tripple)  // All except the owner's reward
+						game_total -= game_tripple // Lower the total
+						game.Middle -= 3           // Lower the middle counter
 					} else { // Game without bonus
 						if TD {
 							l(LOG_DEBUG, "GAME: ", LogName(game.ThisGame), " the 1 middle coin back the owner, sending ", game.Nominal, " to ", LogName(game.Owner))
 						}
-						r = game.addResponse(r, ACTION_TRANSFER,	// Reward the game owner
-						game.ThisGame,     // From this game
-						game.Owner,        // To the game owner
-						game.Nominal)      // Just one coin
-						game_total -= game.Nominal               // Lower the total
-						game.Middle -= 1                         // Lower the middle counter
+						r = game.addResponse(r, ACTION_TRANSFER, // Reward the game owner
+							game.ThisGame, // From this game
+							game.Owner,    // To the game owner
+							game.Nominal)  // Just one coin
+						game_total -= game.Nominal // Lower the total
+						game.Middle -= 1           // Lower the middle counter
 					}
 					if TD {
 						l(LOG_DEBUG, "GAME: ", LogName(game.ThisGame), " rewarding the winner, sending ", game_total-game_tripple, " to ", LogName(from))
 					}
-					r = game.addResponse(r, ACTION_TRANSFER,	// Send (the rest) of the money to the winner
-					game.ThisGame,     // From this game
-					from,                // To the winner
-					game_total)            // All (except the owner's reward)
+					r = game.addResponse(r, ACTION_TRANSFER, // Send (the rest) of the money to the winner
+						game.ThisGame, // From this game
+						from,          // To the winner
+						game_total)    // All (except the owner's reward)
 					game.ResetGame()
 					return r
 				}
@@ -237,7 +252,7 @@ func (game *TritsGame) PlaceCoin(from *TritsAddress, amount uint64) []*TritsGame
 }
 
 // Add response to teh responses slice
-func (game *TritsGame) addResponse(r []*TritsGameResponse, action int8, from *TritsAddress, to *TritsAddress, amount uint64) []*TritsGameResponse{
+func (game *TritsGame) addResponse(r []*TritsGameResponse, action int8, from *TritsAddress, to *TritsAddress, amount uint64) []*TritsGameResponse {
 	response := NewGameResponse()
 	response.Action = action
 	response.Funds_from = from

@@ -54,12 +54,23 @@ func (p *TritsPlayer) ChooseAmount() uint64 {
 		b := RandByte()
 		pocket := p.Balance()
 		percent := int8(b%5 + 1) // Bet no more between 1 - 5 percent of the pocket
+		percent = 1              // Try with 1 percent
 		return uint64(math.Round(float64(percent) / 100 * float64(pocket)))
 	}
 }
 
 func (p *TritsPlayer) Balance() uint64 {
 	return p.banker.Tell(p.Addr)
+}
+
+// Borrow money if necessary
+func (p *TritsPlayer) Borrow(max_borrow uint64) uint64 {
+	pocket := p.Balance()
+	if max_borrow > 100*pocket {
+		return max_borrow
+	} else {
+		return 0
+	}
 }
 
 // Bet or not - some strategy should be implemented here
@@ -136,8 +147,8 @@ func (p *TritsPlayer) Bet(desk []*TritsGame) []*TritsPlayerResponse {
 func (p *TritsPlayer) Name() string {
 	var name string = ""
 	switch p.Addr.Raw() {
-	case NoAddr:
-		name = "Null"
+	case LenderAddr:
+		name = "Lender"
 	case BankAddr:
 		name = "Bank"
 	case NeoAddr:
@@ -176,7 +187,7 @@ func (p *TritsPlayer) Name() string {
 
 // Helper function to get player name by address statically
 func PlayerName(addr *TritsAddress) string {
-	b := NewTritsBanker(0, 0)
+	b := NewTritsBanker(0)
 	p := NewTritsPlayer(addr, b)
 	return p.Name()
 }

@@ -5,7 +5,7 @@ import (
 	"time"
 )
 
-const NoAddr string = "0000000000000000000000000000000000000000"
+const LenderAddr string = "0000000000000000000000000000000000000000"
 const BankAddr string = "ffffffffffffffffffffffffffffffffffffffff"
 const NeoAddr string = "1111111111111111111111111111111111111111"
 const TrinityAddr string = "2222222222222222222222222222222222222222"
@@ -22,6 +22,7 @@ const SeraphAddr = "cccccccccccccccccccccccccccccccccccccccc"
 const ArchitectAddr = "dddddddddddddddddddddddddddddddddddddddd"
 const BaneAddr = "eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee"
 
+// TritsSquad is a slice of *TritsPlayer
 type TritsSquad struct {
 	squad []*TritsPlayer // Our dear players
 }

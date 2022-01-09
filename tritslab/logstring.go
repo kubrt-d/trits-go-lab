@@ -44,3 +44,31 @@ func LogName(a *TritsAddress) string {
 	}
 	return name
 }
+
+// CSV column headers - players
+func LogPlayersHeaders() {
+	s := NewTritsSquad(NewTritsBanker(0))
+	l := len(s.squad) - 1
+	for k, p := range s.squad {
+		fmt.Print(LogName(p.Addr))
+		if k < l {
+			fmt.Print(",")
+		} else {
+			fmt.Println("")
+		}
+	}
+}
+
+// CSV column headers - players
+func LogPlayersBalances(banker *TritsBanker) {
+	s := NewTritsSquad(banker)
+	l := len(s.squad) - 1
+	for k, p := range s.squad {
+		fmt.Print(banker.Tell(p.Addr))
+		if k < l {
+			fmt.Print(",")
+		} else {
+			fmt.Println("")
+		}
+	}
+}

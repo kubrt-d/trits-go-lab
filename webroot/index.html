@@ -1,0 +1,88 @@
+<html>
+
+<head>
+    <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
+    <script type="text/javascript">
+        const SAMPLE_RATE = 100
+        google.charts.load('current', {
+            'packages': ['corechart']
+        });
+        google.charts.setOnLoadCallback(drawDataChart);
+
+        function drawDataChart() {
+            loadData("/data/year.csv", drawChart)
+        }
+
+        function drawChart(data_array) {
+            var data = google.visualization.arrayToDataTable(data_array);
+            var options = {
+                title: 'Company Performance',
+                curveType: 'function',
+                legend: {
+                    position: 'bottom'
+                }
+            };
+
+            var chart = new google.visualization.LineChart(document.getElementById('curve_chart'));
+
+            chart.draw(data, options);
+        }
+
+        function loadData(location, callback) {
+            var request = new XMLHttpRequest();
+            request.open('GET', location, true);
+            request.send(null);
+            request.onreadystatechange = function() {
+                if (request.readyState === 4 && request.status === 200) {
+                    var type = request.getResponseHeader('Content-Type');
+                    if (type.indexOf("text") !== 1) {
+                        callback(csvToArray(request.responseText))
+                    }
+                }
+            }
+        }
+
+        function csvToArray(csv) {
+
+            var lines = csv.split("\n");
+
+            var result = [];
+
+            // NOTE: If your columns contain commas in their values, you'll need
+            // to deal with those before doing the next step 
+            // (you might convert them to &&& or something, then covert them back later)
+            // jsfiddle showing the issue https://jsfiddle.net/
+
+            var headers = lines[0].split(",");
+            result.push(headers);
+            for (var i = 1; i < lines.length - 1; i++) {
+                if (i % SAMPLE_RATE != 0) {
+                    continue
+                }
+                var arr = [];
+                var currentline = lines[i].split(",");
+
+                for (var j = 0; j < headers.length; j++) {
+                    if (j > 0) {
+                        arr[j] = parseInt(currentline[j]);
+                    } else {
+                        arr[j] = currentline[j];
+                    }
+                }
+
+                result.push(arr);
+
+            }
+
+            return result
+        }
+    </script>
+</head>
+
+<body>
+    <div id="curve_chart" style="width: 100%; height: 100%"></div>
+</body>
+
+</html>
+
+</html>
