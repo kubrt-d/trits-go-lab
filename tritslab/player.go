@@ -19,8 +19,9 @@ func NewTritsPlayerResponse(game *TritsGame, amount uint64, my_addr *TritsAddres
 }
 
 type TritsPlayer struct {
-	Addr   *TritsAddress // Player's address
-	banker *TritsBanker  // Connection to the banker
+	Addr         *TritsAddress // Player's address
+	banker       *TritsBanker  // Connection to the banker
+	started_with uint64        // Initail pocket before joining the game
 }
 
 func NewTritsPlayer(addr *TritsAddress, banker *TritsBanker) *TritsPlayer {
@@ -39,6 +40,11 @@ func NewTritsPlayerFactory(addr *TritsAddress, banker *TritsBanker, strategy str
 	return nil
 }
 
+// Set started_with
+func (p *TritsPlayer) SetStartedWith(started_with uint64) {
+	p.started_with = started_with
+}
+
 // Choose the table
 func (p *TritsPlayer) ChooseTable() int8 {
 	b := RandByte()
@@ -53,8 +59,7 @@ func (p *TritsPlayer) ChooseAmount() uint64 {
 	} else {
 		b := RandByte()
 		pocket := p.Balance()
-		percent := int8(b%5 + 1) // Bet no more between 1 - 5 percent of the pocket
-		percent = 1              // Try with 1 percent
+		percent := int8(b%3 + 1) // Bet no more between 1 - 3 percent of the pocket
 		return uint64(math.Round(float64(percent) / 100 * float64(pocket)))
 	}
 }
@@ -71,6 +76,20 @@ func (p *TritsPlayer) Borrow(max_borrow uint64) uint64 {
 	} else {
 		return 0
 	}
+}
+
+// Take profit as pleased
+func (p *TritsPlayer) TakeProfit() uint64 {
+	pocket := p.Balance()
+	if pocket < p.started_with*PROFIT_TRESHOLD { // Have not won enough money yet
+		return 0
+	} else {
+		r := RandByte()
+		if r%100 < LEAVE_GAME_PROB { // 0 means never leave the game
+			return pocket - p.started_with
+		}
+	}
+	return 0
 }
 
 // Bet or not - some strategy should be implemented here

@@ -29,6 +29,7 @@ func NewTritsCroupier(lot uint64, bank_start uint64, max_borrow uint64) *TritsCr
 	var i int = 0
 	for i < size { // and divide the rest evenly among all the players
 		croupier.Banker.MoveFunds(bank, croupier.Players.squad[i].Addr, amount_to_player)
+		croupier.Players.squad[i].SetStartedWith(amount_to_player)
 		if TD {
 			l(LOG_INFO, "BANKER sends ", amount_to_player, " to ", croupier.Players.squad[i].Name())
 		}
@@ -125,18 +126,29 @@ func (c *TritsCroupier) AskAround() bool {
 	for j < num_players {
 		if TD {
 			c.Banker.gameshealthcheck(c.Table.Desk)
-			l(LOG_DEBUG, "CROUPIER asks ", c.Players.squad[j].Name(), " if she want's to borrow some meoney ...")
+			l(LOG_DEBUG, "CROUPIER asks ", c.Players.squad[j].Name(), " if she wants to borrow some meoney ...")
 		}
+
 		amount := c.Players.squad[j].Borrow(c.max_borrow)
 
-		if amount == 0 {
-			j++
-			continue
-		} else {
-			if TD {
-				l(LOG_DEBUG, c.Players.squad[j].Name(), " borrows ", amount, " from ", LogName(NewTritsAddress(LenderAddr)))
+		if amount > 0 {
+			{
+				if TD {
+					l(LOG_DEBUG, c.Players.squad[j].Name(), " borrows ", amount, " from ", LogName(NewTritsAddress(LenderAddr)))
+				}
+				c.Banker.MoveFunds(NewTritsAddress(LenderAddr), c.Players.squad[j].Addr, amount)
 			}
-			c.Banker.MoveFunds(NewTritsAddress(LenderAddr), c.Players.squad[j].Addr, amount)
+		}
+
+		if TD {
+			c.Banker.gameshealthcheck(c.Table.Desk)
+			l(LOG_DEBUG, "CROUPIER asks ", c.Players.squad[j].Name(), " if she wants to take profits ...")
+		}
+
+		amount = c.Players.squad[j].TakeProfit()
+
+		if amount > 0 {
+			c.Banker.MoveFunds(c.Players.squad[j].Addr, NewTritsAddress(LenderAddr), amount)
 		}
 		j++
 	}

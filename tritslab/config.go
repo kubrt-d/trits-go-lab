@@ -9,3 +9,5 @@ const BONUS_LOW = 3
 const BONUS_HIGH = 3
 const LOG_LEVEL = LOG_DEBUG     // LOG_DEBUG<LOG_INFO < LOG_NOT
 const WORLDS_MONEY = 1000000000 // Borrow fund initial amount
+const PROFIT_TRESHOLD = 4       // Times the initial amount
+const LEAVE_GAME_PROB = 1       // 1-100 chance to leave the game if profit is gretter than the PROFIT_TRESHOLD
