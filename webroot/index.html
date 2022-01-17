@@ -54,7 +54,7 @@
 
             var headers = lines[0].split(",");
             result.push(headers);
-            sample_rate = Math.floor(lines.length / 100) + 1
+            sample_rate = Math.floor(lines.length / 200) + 1
             for (var i = 1; i < lines.length - 1; i++) {
                 if (i % sample_rate != 0) {
                     continue

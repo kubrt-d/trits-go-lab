@@ -96,7 +96,8 @@ func TestTritsGame_PlaceCoin(t *testing.T) {
 			t.Errorf("TritsGame.PlaceCoin().Middle = %v, want %v", middle, 5)
 		}
 	})
-	// TRINITY SENDS TOO MUCH - 500 is returned and 300 is placed on vertice 1
+	// TRINITY SENDS TOO MUCH - 2 coins are accepted and 200 is returned
+	// 1,2  trinity 800 => 5(1,1,0)
 	t.Run("Trinity sends too much", func(t *testing.T) {
 		res := game.PlaceCoin(trinity_addr, 800)
 
@@ -106,12 +107,13 @@ func TestTritsGame_PlaceCoin(t *testing.T) {
 		assert.Action = ACTION_TRANSFER
 		assert.Funds_from = game_addr
 		assert.Funds_to = trinity_addr
-		assert.Amount = 500
+		assert.Amount = 200
 		test(t, response, assert)
 		total := game.GetTotal()
 		v10_addr_h := game.Trit.V1[0].Human()
-		if total != 6*300 {
-			t.Errorf("TritsGame.PlaceCoin().GetTotal() = %v, want %v", total, 6*300)
+		v20_addr_h := game.Trit.V2[0].Human()
+		if total != 7*300 {
+			t.Errorf("TritsGame.PlaceCoin().GetTotal() = %v, want %v", total, 7*300)
 		}
 		middle := game.Middle
 		if middle != 5 {
@@ -120,45 +122,53 @@ func TestTritsGame_PlaceCoin(t *testing.T) {
 		if v10_addr_h != trinity_addr.Human() {
 			t.Errorf("TritsGame.PlaceCoin().V1[0] = %v, want %v", v10_addr_h, trinity_addr.Human())
 		}
+		if v20_addr_h != trinity_addr.Human() {
+			t.Errorf("TritsGame.PlaceCoin().V1[0] = %v, want %v", v20_addr_h, trinity_addr.Human())
+		}
 
 	})
 	// MORPHEUS SENDS 2 COINS - V2, V3
+	// 3, morpheus 300 => 5(1,1,1)
+	// 2, morpheus 300 => 5(1,2,1)
 	t.Run("Morpheus sends two coins", func(t *testing.T) {
 		game.PlaceCoin(morpheus_addr, 300)
 		game.PlaceCoin(morpheus_addr, 300)
 		total := game.GetTotal()
-		v20_addr_h := game.Trit.V2[0].Human()
+		v21_addr_h := game.Trit.V2[1].Human()
 		v30_addr_h := game.Trit.V3[0].Human()
-		if total != 8*300 {
-			t.Errorf("TritsGame.PlaceCoin().GetTotal() = %v, want %v", total, 6*300)
+		if total != 9*300 {
+			t.Errorf("TritsGame.PlaceCoin().GetTotal() = %v, want %v", total, 9*300)
 		}
 
-		if v20_addr_h != morpheus_addr.Human() {
-			t.Errorf("TritsGame.PlaceCoin().V1[0] = %v, want %v", v20_addr_h, morpheus_addr.Human())
+		if v21_addr_h != morpheus_addr.Human() {
+			t.Errorf("TritsGame.PlaceCoin().V1[0] = %v, want %v", v21_addr_h, morpheus_addr.Human())
 		}
 		if v30_addr_h != morpheus_addr.Human() {
-			t.Errorf("TritsGame.PlaceCoin().V1[0] = %v, want %v", v20_addr_h, morpheus_addr.Human())
+			t.Errorf("TritsGame.PlaceCoin().V1[0] = %v, want %v", v30_addr_h, morpheus_addr.Human())
 		}
 	})
 	// AGENT SENDS 2 COINS - V2,V2
+	// 2, agent 300 => 5(1,3,1)
+	// 3, agent 300 => 5(1,3,2)
 	t.Run("Agent sends two coins", func(t *testing.T) {
 		game.PlaceCoin(agent_addr, 300)
 		game.PlaceCoin(agent_addr, 300)
 		total := game.GetTotal()
-		v21_addr_h := game.Trit.V2[1].Human()
 		v22_addr_h := game.Trit.V2[2].Human()
-		if total != 10*300 {
-			t.Errorf("TritsGame.PlaceCoin().GetTotal() = %v, want %v", total, 10*300)
+		v31_addr_h := game.Trit.V3[1].Human()
+		if total != 11*300 {
+			t.Errorf("TritsGame.PlaceCoin().GetTotal() = %v, want %v", total, 11*300)
 		}
 
-		if v21_addr_h != agent_addr.Human() {
-			t.Errorf("TritsGame.PlaceCoin().V1[0] = %v, want %v", v21_addr_h, agent_addr.Human())
-		}
 		if v22_addr_h != agent_addr.Human() {
 			t.Errorf("TritsGame.PlaceCoin().V1[0] = %v, want %v", v22_addr_h, agent_addr.Human())
 		}
+		if v31_addr_h != agent_addr.Human() {
+			t.Errorf("TritsGame.PlaceCoin().V1[0] = %v, want %v", v31_addr_h, agent_addr.Human())
+		}
 	})
-	// KEYMAKER SENDS TOO LITTLE, TOO MUCH AND CORRECT - x,V3,V1
+	// KEYMAKER SENDS TOO LITTLE, THEN TOO MUCH
+	// 1,2 keymaker 666 =>5(2,4,2)
 	t.Run("Keymaker tries 3 times", func(t *testing.T) {
 		res := game.PlaceCoin(keymaker_addr, 133)
 		response := res[0]
@@ -169,8 +179,8 @@ func TestTritsGame_PlaceCoin(t *testing.T) {
 		assert.Amount = 133
 		test(t, response, assert)
 		total := game.GetTotal()
-		if total != 10*300 {
-			t.Errorf("TritsGame.PlaceCoin().GetTotal() = %v, want %v", total, 10*300)
+		if total != 11*300 {
+			t.Errorf("TritsGame.PlaceCoin().GetTotal() = %v, want %v", total, 11*300)
 		}
 
 		res = game.PlaceCoin(keymaker_addr, 666)
@@ -179,56 +189,43 @@ func TestTritsGame_PlaceCoin(t *testing.T) {
 		assert.Action = ACTION_TRANSFER
 		assert.Funds_from = game_addr
 		assert.Funds_to = keymaker_addr
-		assert.Amount = 366
+		assert.Amount = 66
 		test(t, response, assert)
 		total = game.GetTotal()
-		if total != 11*300 {
-			t.Errorf("TritsGame.PlaceCoin().GetTotal() = %v, want %v", total, 11*300)
+		if total != 13*300 {
+			t.Errorf("TritsGame.PlaceCoin().GetTotal() = %v, want %v", total, 13*300)
 		}
 
-		v31_addr_h := game.Trit.V3[1].Human()
-		if v31_addr_h != keymaker_addr.Human() {
-			t.Errorf("TritsGame.PlaceCoin().V3[1] = %v, want %v", v31_addr_h, keymaker_addr.Human())
-		}
-
-		res = game.PlaceCoin(keymaker_addr, 300)
-		if len(res) > 0 {
-			t.Errorf("TritsGame.PlaceCoin().Response (len) = %v, want %v", len(res), 0)
-		}
-
-		total = game.GetTotal()
-		if total != 12*300 {
-			t.Errorf("TritsGame.PlaceCoin().GetTotal() = %v, want %v", total, 12*300)
+		v23_addr_h := game.Trit.V2[3].Human()
+		if v23_addr_h != keymaker_addr.Human() {
+			t.Errorf("TritsGame.PlaceCoin().V3[1] = %v, want %v", v23_addr_h, keymaker_addr.Human())
 		}
 
 	})
 	// NEO WINS THE GAME (with a slightly wrong amount)
-	t.Run("Neo sends 300 then 310 and wins the game", func(t *testing.T) {
-		game.PlaceCoin(neo_addr, 300)
-		total := game.GetTotal()
-		if total != 13*300 {
-			t.Errorf("TritsGame.PlaceCoin().GetTotal() = %v, want %v", total, 13*300)
-		}
-		responses := game.PlaceCoin(neo_addr, 310)
+	t.Run("Neo sends 610, wins the game and starts a new one", func(t *testing.T) {
+
+		responses := game.PlaceCoin(neo_addr, 610)
 		res0 := responses[0]
 		assert0 := NewGameResponse()
 		assert0.Action = ACTION_TRANSFER
 		assert0.Funds_from = game_addr
 		assert0.Funds_to = neo_addr
-		assert0.Amount = 10
+		assert0.Amount = 14 * 300
 		test(t, res0, assert0)
 
 		res1 := responses[1]
 		assert1 := NewGameResponse()
-		assert1.Action = ACTION_TRANSFER
-		assert1.Funds_from = game_addr
-		assert1.Funds_to = neo_addr
-		assert1.Amount = 14 * 300
+		assert1.Action = ACTION_ASK_BONUS
+		assert1.Funds_from = bank_addr
+		assert1.Funds_to = game_addr
+		assert1.Amount = 0
 		test(t, res1, assert1)
-		total = game.GetTotal()
-		if total != 0 {
-			t.Errorf("TritsGame.PlaceCoin().GetTotal() = %v, want %v", total, 0)
+		total := game.GetTotal()
+		if total != 310 {
+			t.Errorf("TritsGame.PlaceCoin().GetTotal() = %v, want %v", total, 310)
 		}
+
 	})
 	// Reward the owner
 	//TODO: Re write this test to take into teh acccount that Neo may not win
@@ -267,9 +264,16 @@ func TestTritsGame_PlaceCoin(t *testing.T) {
 		assert0 := NewGameResponse()
 		assert0.Action = ACTION_TRANSFER
 		assert0.Funds_from = game_addr
-		assert0.Funds_to = bank_addr
-		assert0.Amount = 7 * 333
+		assert0.Funds_to = trinity_addr
+		assert0.Amount = 333
 		test(t, res0, assert0)
+		res1 := response[1]
+		assert1 := NewGameResponse()
+		assert1.Action = ACTION_TRANSFER
+		assert1.Funds_from = game_addr
+		assert1.Funds_to = bank_addr
+		assert1.Amount = 6 * 333
+		test(t, res1, assert1)
 		total := ephemeral_game.GetTotal()
 		if total != 10 {
 			t.Errorf("TritsGame.PlaceCoin().GetTotal() = %v, want %v", total, 10)

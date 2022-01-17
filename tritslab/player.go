@@ -130,7 +130,12 @@ func (p *TritsPlayer) Bet(desk []*TritsGame) []*TritsPlayerResponse {
 		j++
 	}
 	if j < GAMES_ON_TABLE { // Found a good inbalance, bet
-		res := NewTritsPlayerResponse(desk[j], desk[j].Nominal, p.Addr)
+		b := RandByte()
+		x := int8(b%3 + 1) // Throw 1-3 coins in one go
+		if pocket < uint64(x)*desk[j].Nominal {
+			x = 1
+		}
+		res := NewTritsPlayerResponse(desk[j], uint64(x)*desk[j].Nominal, p.Addr)
 		responses = append(responses, res)
 		if TD {
 			l(LOG_NOTICE, LogName(p.Addr), " has ", pocket, " and finds inbalance 2 ", LogName(desk[j].ThisGame), ", nominal ", desk[j].Nominal)
@@ -158,7 +163,7 @@ func (p *TritsPlayer) Bet(desk []*TritsGame) []*TritsPlayerResponse {
 	if TD {
 		l(LOG_NOTICE, LogName(p.Addr), " has got ", pocket, " only and can't afford any game")
 	}
-	// I seem to be out of game
+
 	return nil
 }
 
