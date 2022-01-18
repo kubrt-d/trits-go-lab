@@ -5,7 +5,7 @@ import (
 	"time"
 )
 
-func test(t *testing.T, r *TritsGameResponse, a *TritsGameResponse) bool {
+func test(t *testing.T, r TritsGameResponse, a TritsGameResponse) bool {
 	var ok bool = true
 	if r.Action != a.Action {
 		ok = false

@@ -10,8 +10,8 @@ type TritsBanker struct {
 }
 
 // Create new trits banker, add start_with to the bank address and WORLDS_Money to the lender's address
-func NewTritsBanker(start_with uint64) *TritsBanker {
-	banker := new(TritsBanker)
+func NewTritsBanker(start_with uint64) TritsBanker {
+	banker := TritsBanker{}
 	banker.started_with = start_with
 	banker.bank = make(map[string]uint64)
 	banker.bank[BankAddr] = start_with
@@ -45,7 +45,7 @@ func (b *TritsBanker) gameshealthcheck(games []*TritsGame) bool {
 }
 
 // Tell balance for address
-func (b *TritsBanker) Tell(who *TritsAddress) uint64 {
+func (b *TritsBanker) Tell(who TritsAddress) uint64 {
 	w := who.Raw()
 	if amount, ok := b.bank[w]; !ok {
 		return 0
@@ -55,7 +55,7 @@ func (b *TritsBanker) Tell(who *TritsAddress) uint64 {
 }
 
 // Move funds from one address/account to another
-func (b *TritsBanker) MoveFunds(from *TritsAddress, to *TritsAddress, amount uint64) (bool, string) {
+func (b *TritsBanker) MoveFunds(from TritsAddress, to TritsAddress, amount uint64) (bool, string) {
 	// The from address must exist
 	f := from.Raw()
 	t := to.Raw()
@@ -86,7 +86,7 @@ func (b *TritsBanker) MoveFunds(from *TritsAddress, to *TritsAddress, amount uin
 }
 
 // Determines bonus, moves funds to the game and tell croupier how much for the PlaceCoin
-func (b *TritsBanker) PutBonus(game *TritsGame) uint64 {
+func (b *TritsBanker) PutBonus(game TritsGame) uint64 {
 	in_bank := b.Tell(NewTritsAddress(BankAddr))
 	var bonus byte = 0
 	bonus = 2 + RandByte()%3

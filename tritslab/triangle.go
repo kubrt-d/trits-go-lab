@@ -23,14 +23,14 @@ func NewTritsTriangle() *TritsTriangle {
 * The victory occurs when the number of coins on the vertice that has just been hit outnumbers the
 * number of coins on any other vertice by the value of "outweight" const (default = 3)
  */
-func (t *TritsTriangle) HitVertice(vertice int8, by *TritsAddress) bool {
+func (t *TritsTriangle) HitVertice(vertice int8, by TritsAddress) bool {
 	switch vertice {
 	case 1:
-		t.V1 = append(t.V1, by)
+		t.V1 = append(t.V1, &by)
 	case 2:
-		t.V2 = append(t.V2, by)
+		t.V2 = append(t.V2, &by)
 	case 3:
-		t.V3 = append(t.V3, by)
+		t.V3 = append(t.V3, &by)
 	}
 	return t.Inbalance() == OUTWEIGHT
 }

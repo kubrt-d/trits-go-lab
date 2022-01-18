@@ -1,9 +1,8 @@
-/* Inheritance in GO example 
 package main
 
-import "fmt"
+/* Inheritance in GO example
 
-func main() {
+func xxtest() {
 
 	var animals [5]Animal
 	animals[0] = AnimalFactory("dog", "Barnie")
@@ -74,3 +73,4 @@ type JavaProgrammer struct {
 func (j JavaProgrammer) Speak() string {
 	return "Design patterns!"
 }
+***/

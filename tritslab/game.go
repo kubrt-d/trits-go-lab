@@ -8,64 +8,65 @@ const ACTION_TRANSFER = 1
 const ACTION_ASK_BONUS = 2
 
 type TritsGameResponse struct {
-	Action     int8          // what to do, one of the: ACTION_TRANSFER ACTION_ASK_BONUS
-	Funds_from *TritsAddress //	(optional) if funds transfer is involved, this tells from which address the funds should be taken
-	Funds_to   *TritsAddress //	(optional) if funds transfer is involved, this tells to which address the funds should be sent
-	Amount     uint64        //	(optonal) how much to send
+	Action     int8         // what to do, one of the: ACTION_TRANSFER ACTION_ASK_BONUS
+	Funds_from TritsAddress //	(optional) if funds transfer is involved, this tells from which address the funds should be taken
+	Funds_to   TritsAddress //	(optional) if funds transfer is involved, this tells to which address the funds should be sent
+	Amount     uint64       //	(optonal) how much to send
 }
 
-func NewGameResponse() *TritsGameResponse { // Constructor
-	gr := new(TritsGameResponse)
+func NewGameResponse() TritsGameResponse { // Constructor
+	gr := TritsGameResponse{}
 	gr.Action = ACTION_TRANSFER
-	gr.Funds_from = nil
-	gr.Funds_to = nil
+	gr.Funds_from = NewTritsAddress(NoAddr)
+	gr.Funds_to = NewTritsAddress(NoAddr)
 	gr.Amount = 0
 	return gr
 }
 
 type TritsGame struct {
-	Trit     *TritsTriangle // The triangle which holds the game status
-	ThisGame *TritsAddress  // Address of this game
-	Owner    *TritsAddress  // Whoever starts the game, owns the game
-	Nominal  uint64         // Game nominal (set by the first PlaceCoin call), 0 means the game has not yet started
-	Middle   uint32         // Number of coins in the middle
-	updated  int64          // Nanotime last updated
-	ll       int64          // Time to expire
-	rand     Random3Dice    // Random number generator of choice
+	Trit     TritsTriangle // The triangle which holds the game status
+	ThisGame TritsAddress  // Address of this game
+	Owner    TritsAddress  // Whoever starts the game, owns the game
+	Nominal  uint64        // Game nominal (set by the first PlaceCoin call), 0 means the game has not yet started
+	Middle   uint32        // Number of coins in the middle
+	updated  int64         // Nanotime last updated
+	ll       int64         // Time to expire
+	rand     Random3Dice   // Random number generator of choice
 }
 
 func (game *TritsGame) ResetGame() {
-	game.Trit = NewTritsTriangle()
+	game.Trit = TritsTriangle{}
 	game.Nominal = 0
 	game.Middle = 0
-	game.Owner = nil
+	game.Owner = NewTritsAddress(NoAddr)
 	game.updated = time.Now().UnixNano()
 }
 
-func NewTritsGame(addr *TritsAddress, lifelength int64, rand Random3Dice) *TritsGame {
-	game := new(TritsGame)
+func NewTritsGame(addr TritsAddress, lifelength int64, rand Random3Dice) TritsGame {
+	game := TritsGame{}
 	game.ResetGame()
 	game.ThisGame = addr
 	game.ll = lifelength
 	game.rand = rand
+	game.Toggle()
 	return game
 }
 
 /* Start a new game */
-func (game *TritsGame) StartGame(by *TritsAddress, nominal uint64) {
+func (game *TritsGame) StartGame(by TritsAddress, nominal uint64) {
 	if TD {
 		l(LOG_DEBUG, "GAME: ", LogName(game.ThisGame), " starting with nominal ", nominal, " by ", LogName(by))
 	}
-	game.updated = time.Now().UnixNano() // It's an update
-	game.Nominal = nominal               // Set the nominal
-	game.Middle = 1                      // First coin in the middle
-	game.Owner = by                      // Set the game owner
+	game.Nominal = nominal // Set the nominal
+	game.Middle = 1        // First coin in the middle
+	game.Owner = by        // Set the game owner
+	game.Toggle()          // It's an update
 }
 
 /* Place coin on the trit - by the time this function is called, the amount has already been added to the game address */
-func (game *TritsGame) PlaceCoin(from *TritsAddress, amount uint64) []*TritsGameResponse {
+func (game *TritsGame) PlaceCoin(from TritsAddress, amount uint64) []TritsGameResponse {
 
-	var r []*TritsGameResponse = nil
+	var r []TritsGameResponse = nil
 	var coins_in uint32 = 0
 	var rest uint64 = 0
 
@@ -321,7 +322,7 @@ func (game *TritsGame) PlaceCoin(from *TritsAddress, amount uint64) []*TritsGame
 }
 
 // Add response to teh responses slice
-func (game *TritsGame) addResponse(r []*TritsGameResponse, action int8, from *TritsAddress, to *TritsAddress, amount uint64) []*TritsGameResponse {
+func (game *TritsGame) addResponse(r []TritsGameResponse, action int8, from TritsAddress, to TritsAddress, amount uint64) []TritsGameResponse {
 	response := NewGameResponse()
 	response.Action = action
 	response.Funds_from = from
@@ -339,4 +340,8 @@ func (game *TritsGame) GetTotal() uint64 {
 // Get the Trit inbalance
 func (game *TritsGame) GetInbalance() int8 {
 	return game.Trit.Inbalance()
+}
+
+func (game *TritsGame) Toggle() {
+	game.updated = time.Now().UnixNano() // It's an update
 }

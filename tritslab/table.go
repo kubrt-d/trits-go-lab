@@ -4,13 +4,17 @@ type TritsTable struct {
 	Desk []*TritsGame // Croupier's table
 }
 
-func NewTritsTable() *TritsTable {
+func NewTritsTable() TritsTable {
 	dice := NewTritsDice()
-	t := new(TritsTable)
+	t := TritsTable{}
 	var i int = 0
 	for i < GAMES_ON_TABLE {
-		game := NewTritsGame(t.GetCityAddress(i), TRITS_GAME_LONGEVITY, dice)
-		t.Desk = append(t.Desk, game)
+		game := TritsGame{}
+		game.ThisGame = t.GetCityAddress(i)
+		game.ll = TRITS_GAME_LONGEVITY
+		game.rand = dice
+		game.Toggle()
+		t.Desk = append(t.Desk, &game)
 		i++
 	}
 	return t
@@ -49,9 +53,9 @@ func (t *TritsTable) GetCityName(index int) string {
 	}
 }
 
-// Define an address for each city
-func (t *TritsTable) GetCityAddress(index int) *TritsAddress {
-	var all_addresses = [23]*TritsAddress{
+// Define city names
+func (t *TritsTable) GetCityAddress(index int) TritsAddress {
+	var all_addresses = [23]TritsAddress{
 		NewTritsAddress("1000000010000000100000001000000010000000"),
 		NewTritsAddress("1000000110000000100000001000000010000001"),
 		NewTritsAddress("1000000210000000100000001000000010000002"),
@@ -79,19 +83,6 @@ func (t *TritsTable) GetCityAddress(index int) *TritsAddress {
 	if index >= 0 && index < GAMES_ON_TABLE {
 		return all_addresses[index]
 	} else {
-		return nil
+		return NewTritsAddress(NoAddr)
 	}
-}
-
-// Human readable game names fo logging purposes
-func GameName(a *TritsAddress) string {
-	t := new(TritsTable)
-	var i int = 0
-	for i < GAMES_ON_TABLE {
-		if a.Equals(t.GetCityAddress(i)) {
-			return t.GetCityName(i)
-		}
-		i++
-	}
-	return a.Human()
 }

@@ -5,8 +5,8 @@ import (
 	tl "trits/tritslab"
 )
 
-func xxmain() {
-	// TODO: fix logging to file
+func main() {
+
 	/*
 		// open log file
 		logFile, err := os.OpenFile(tl.LOG_FILE, os.O_APPEND|os.O_RDWR|os.O_CREATE, 0644)

@@ -4,10 +4,10 @@ package tritslab
 //"time"
 
 type TritsCroupier struct {
-	Table      *TritsTable  // Croupier's table
-	Players    *TritsSquad  // Players
-	Banker     *TritsBanker // Banker
-	max_borrow uint64       // Max amount which can be borrowed
+	Table      TritsTable  // Croupier's table
+	Players    TritsSquad  // Players
+	Banker     TritsBanker // Banker
+	max_borrow uint64      // Max amount which can be borrowed
 }
 
 // Croupier starts his day, with a certain lot for players and something to give to the bank
@@ -28,7 +28,7 @@ func NewTritsCroupier(lot uint64, bank_start uint64, max_borrow uint64) *TritsCr
 	amount_to_player := (lot - (lot % uint64(size))) / uint64(size) // Distribute evenly
 	var i int = 0
 	for i < size { // and divide the rest evenly among all the players
-		croupier.Banker.MoveFunds(bank, croupier.Players.squad[i].Addr, amount_to_player)
+		croupier.Banker.MoveFunds(bank, croupier.Players.squad[i].GetAddr(), amount_to_player)
 		croupier.Players.squad[i].SetStartedWith(amount_to_player)
 		if TD {
 			l(LOG_INFO, "BANKER sends ", amount_to_player, " to ", croupier.Players.squad[i].Name())
@@ -101,7 +101,7 @@ func (c *TritsCroupier) AskAround() bool {
 						if TD {
 							l(LOG_DEBUG, "CROUPIER passes ACTION_ASK_BONUS to the BANKER")
 						}
-						bonus := c.Banker.PutBonus(r.Game)
+						bonus := c.Banker.PutBonus(*r.Game)
 						if bonus > 0 {
 							r.Game.PlaceCoin(NewTritsAddress(BankAddr), bonus)
 							if TD {
@@ -136,7 +136,7 @@ func (c *TritsCroupier) AskAround() bool {
 				if TD {
 					l(LOG_DEBUG, c.Players.squad[j].Name(), " borrows ", amount, " from ", LogName(NewTritsAddress(LenderAddr)))
 				}
-				c.Banker.MoveFunds(NewTritsAddress(LenderAddr), c.Players.squad[j].Addr, amount)
+				c.Banker.MoveFunds(NewTritsAddress(LenderAddr), c.Players.squad[j].GetAddr(), amount)
 			}
 		}
 
@@ -148,7 +148,7 @@ func (c *TritsCroupier) AskAround() bool {
 		amount = c.Players.squad[j].TakeProfit()
 
 		if amount > 0 {
-			c.Banker.MoveFunds(c.Players.squad[j].Addr, NewTritsAddress(LenderAddr), amount)
+			c.Banker.MoveFunds(c.Players.squad[j].GetAddr(), NewTritsAddress(LenderAddr), amount)
 		}
 		j++
 	}

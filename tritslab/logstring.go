@@ -39,7 +39,7 @@ func LGame(game *TritsGame) string {
 }
 
 // Helper function for translating adresses to names (player or game)
-func LogName(a *TritsAddress) string {
+func LogName(a TritsAddress) string {
 	addr := a.Raw()
 	var name string = ""
 	// Is this a game address or a player address ?
@@ -57,7 +57,7 @@ func LogPlayersHeaders() string {
 	s := NewTritsSquad(NewTritsBanker(0))
 	l := len(s.squad) - 1
 	for k, p := range s.squad {
-		out += fmt.Sprint(LogName(p.Addr))
+		out += fmt.Sprint(LogName(p.GetAddr()))
 		if k < l {
 			out += ","
 		} else {
@@ -68,12 +68,12 @@ func LogPlayersHeaders() string {
 }
 
 // CSV column headers - players
-func LogPlayersBalances(banker *TritsBanker) string {
+func LogPlayersBalances(banker TritsBanker) string {
 	var out string = ""
 	s := NewTritsSquad(banker)
 	l := len(s.squad) - 1
 	for k, p := range s.squad {
-		out += fmt.Sprint(banker.Tell(p.Addr))
+		out += fmt.Sprint(banker.Tell(p.GetAddr()))
 		if k < l {
 			out += ","
 		} else {
@@ -81,4 +81,17 @@ func LogPlayersBalances(banker *TritsBanker) string {
 		}
 	}
 	return out
+}
+
+// Human readable game names fo logging purposes
+func GameName(a TritsAddress) string {
+	t := TritsTable{}
+	var i int = 0
+	for i < GAMES_ON_TABLE {
+		if a.Equals(t.GetCityAddress(i)) {
+			return t.GetCityName(i)
+		}
+		i++
+	}
+	return a.Human()
 }
