@@ -56,7 +56,7 @@
             result.push(headers);
             sample_rate = Math.floor(lines.length / 200) + 1
             for (var i = 1; i < lines.length - 1; i++) {
-                if (i % sample_rate != 0) {
+                if ((i-1) % sample_rate != 0) {
                     continue
                 }
                 var arr = [];

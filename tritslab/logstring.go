@@ -2,6 +2,7 @@ package tritslab
 
 import (
 	"fmt"
+	"log"
 )
 
 const LOG_DEBUG int8 = -1
@@ -11,10 +12,15 @@ const LOG_WARN int8 = 2
 const LOG_ERROR int8 = 3
 const LOG_PANIC int8 = 4
 
+// Export function l
+func L(level int8, a ...interface{}) {
+	l(level, a...)
+}
+
 // Log string if allowed in config
 func l(level int8, a ...interface{}) {
 	if level >= LOG_LEVEL {
-		fmt.Printf("%s \n", fmt.Sprint(a...))
+		log.Println(fmt.Sprint(a...))
 	}
 }
 
@@ -46,29 +52,33 @@ func LogName(a *TritsAddress) string {
 }
 
 // CSV column headers - players
-func LogPlayersHeaders() {
+func LogPlayersHeaders() string {
+	var out string = ""
 	s := NewTritsSquad(NewTritsBanker(0))
 	l := len(s.squad) - 1
 	for k, p := range s.squad {
-		fmt.Print(LogName(p.Addr))
+		out += fmt.Sprint(LogName(p.Addr))
 		if k < l {
-			fmt.Print(",")
+			out += ","
 		} else {
-			fmt.Println("")
+			out += fmt.Sprintln("")
 		}
 	}
+	return out
 }
 
 // CSV column headers - players
-func LogPlayersBalances(banker *TritsBanker) {
+func LogPlayersBalances(banker *TritsBanker) string {
+	var out string = ""
 	s := NewTritsSquad(banker)
 	l := len(s.squad) - 1
 	for k, p := range s.squad {
-		fmt.Print(banker.Tell(p.Addr))
+		out += fmt.Sprint(banker.Tell(p.Addr))
 		if k < l {
-			fmt.Print(",")
+			out += ","
 		} else {
-			fmt.Println("")
+			out += fmt.Sprintln("")
 		}
 	}
+	return out
 }
