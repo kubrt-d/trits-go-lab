@@ -340,7 +340,7 @@ func (game *TritsGame) GetTotal() uint64 {
 }
 
 // Get the Trit inbalance
-func (game *TritsGame) GetInbalance() int8 {
+func (game *TritsGame) GetInbalance() uint8 {
 	return game.Trit.Inbalance()
 }
 

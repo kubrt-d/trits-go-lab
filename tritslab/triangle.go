@@ -1,10 +1,6 @@
 package tritslab
 
-import (
-	"sort"
-)
-
-const OUTWEIGHT int8 = 3
+const OUTWEIGHT uint8 = 3
 
 type TritsTriangle struct {
 	V1, V2, V3 []*TritsAddress
@@ -12,9 +8,9 @@ type TritsTriangle struct {
 
 func NewTritsTriangle() *TritsTriangle {
 	triangle := new(TritsTriangle)
-	triangle.V1 = nil
-	triangle.V2 = nil
-	triangle.V3 = nil
+	triangle.V1 = make([]*TritsAddress, 0, 15)
+	triangle.V2 = make([]*TritsAddress, 0, 15)
+	triangle.V3 = make([]*TritsAddress, 0, 15)
 	return triangle
 }
 
@@ -36,8 +32,23 @@ func (t *TritsTriangle) HitVertice(vertice int8, by TritsAddress) bool {
 }
 
 // Returns the max difference between arms [0,1 or 2] (or even more)
-func (t *TritsTriangle) Inbalance() int8 {
-	s := []int{len(t.V1), len(t.V2), len(t.V3)}
-	sort.Ints(s)
-	return int8(s[2] - s[0])
+func (t *TritsTriangle) Inbalance() uint8 {
+	v1 := uint8(len(t.V1))
+	v2 := uint8(len(t.V2))
+	v3 := uint8(len(t.V3))
+	min := v1
+	max := v1
+	if v2 < min {
+		min = v2
+	}
+	if v2 > max {
+		max = v2
+	}
+	if v3 < min {
+		min = v3
+	}
+	if v2 > max {
+		max = v3
+	}
+	return max - min
 }
