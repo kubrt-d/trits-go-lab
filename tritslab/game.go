@@ -4,14 +4,14 @@ import (
 	"time"
 )
 
-const ACTION_TRANSFER = 1
-const ACTION_ASK_BONUS = 2
+const ACTION_TRANSFER byte = 1
+const ACTION_ASK_BONUS byte = 2
 
 type TritsGameResponse struct {
-	Action     int8         // what to do, one of the: ACTION_TRANSFER ACTION_ASK_BONUS
+	Action     byte         // what to do, one of the: ACTION_TRANSFER ACTION_ASK_BONUS
 	Funds_from TritsAddress //	(optional) if funds transfer is involved, this tells from which address the funds should be taken
 	Funds_to   TritsAddress //	(optional) if funds transfer is involved, this tells to which address the funds should be sent
-	Amount     uint64       //	(optonal) how much to send
+	Amount     uint64       //	(optional) how much to send
 }
 
 func NewGameResponse() TritsGameResponse { // Constructor
@@ -66,7 +66,7 @@ func (game *TritsGame) StartGame(by TritsAddress, nominal uint64) {
 /* Place coin on the trit - by the time this function is called, the amount has already been added to the game address */
 func (game *TritsGame) PlaceCoin(from TritsAddress, amount uint64) []TritsGameResponse {
 
-	var r []TritsGameResponse = nil
+	var r []TritsGameResponse = make([]TritsGameResponse, 0, 5)
 	var coins_in uint32 = 0
 	var rest uint64 = 0
 
@@ -323,14 +323,14 @@ func (game *TritsGame) PlaceCoin(from TritsAddress, amount uint64) []TritsGameRe
 	return r // Nothing to do - TODO: should this be an error as it should never happen ?
 }
 
-// Add response to teh responses slice
-func (game *TritsGame) addResponse(r []TritsGameResponse, action int8, from TritsAddress, to TritsAddress, amount uint64) []TritsGameResponse {
-	response := NewGameResponse()
-	response.Action = action
-	response.Funds_from = from
-	response.Funds_to = to
-	response.Amount = amount
-	r = append(r, response)
+// Add response to the responses slice
+func (game *TritsGame) addResponse(r []TritsGameResponse, action byte, from TritsAddress, to TritsAddress, amount uint64) []TritsGameResponse {
+	r = append(r, TritsGameResponse{
+		Action:     action,
+		Funds_from: from,
+		Funds_to:   to,
+		Amount:     amount,
+	})
 	return r
 }
 

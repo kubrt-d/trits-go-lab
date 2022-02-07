@@ -281,3 +281,16 @@ func TestTritsGame_PlaceCoin(t *testing.T) {
 	})
 
 }
+
+func BenchmarkTritsGame_AddResponse(b *testing.B) {
+	game_addr := NewTritsAddress("e28533750bee16842a5cd4f533d235770e407367")
+	random_dice := NewTritsDice()
+	neo_addr := NewTritsAddress(NeoAddr)
+	bank_addr := NewTritsAddress(BankAddr)
+	game := NewTritsGame(game_addr, 1000000, random_dice)
+	var r []TritsGameResponse = make([]TritsGameResponse, 0,5)
+
+	for n := 0; n < b.N; n++ {
+		game.addResponse(r,ACTION_TRANSFER,neo_addr,bank_addr,1000)
+	}
+}

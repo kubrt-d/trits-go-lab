@@ -3,14 +3,14 @@ package tritslab
 const OUTWEIGHT uint8 = 3
 
 type TritsTriangle struct {
-	V1, V2, V3 []*TritsAddress
+	V1, V2, V3 []TritsAddress
 }
 
 func NewTritsTriangle() *TritsTriangle {
 	triangle := new(TritsTriangle)
-	triangle.V1 = make([]*TritsAddress, 0, 15)
-	triangle.V2 = make([]*TritsAddress, 0, 15)
-	triangle.V3 = make([]*TritsAddress, 0, 15)
+	triangle.V1 = make([]TritsAddress, 0, 15)
+	triangle.V2 = make([]TritsAddress, 0, 15)
+	triangle.V3 = make([]TritsAddress, 0, 15)
 	return triangle
 }
 
@@ -22,11 +22,11 @@ func NewTritsTriangle() *TritsTriangle {
 func (t *TritsTriangle) HitVertice(vertice int8, by TritsAddress) bool {
 	switch vertice {
 	case 1:
-		t.V1 = append(t.V1, &by)
+		t.V1 = append(t.V1, by)
 	case 2:
-		t.V2 = append(t.V2, &by)
+		t.V2 = append(t.V2, by)
 	case 3:
-		t.V3 = append(t.V3, &by)
+		t.V3 = append(t.V3, by)
 	}
 	return t.Inbalance() == OUTWEIGHT
 }
