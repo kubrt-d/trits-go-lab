@@ -82,10 +82,11 @@ func (game *TritsGame) PlaceCoin(from TritsAddress, amount uint64) []TritsGameRe
 		}
 		total := game.GetTotal()
 		if total > 0 {
+
 			r = game.addResponse(r, ACTION_TRANSFER,
 				game.ThisGame, // From this game
 				game.Owner,    // To the game owner
-				game.Nominal)  // Return the initail coin
+				game.Nominal)  // Return the initial coin
 			game.Middle--
 
 			r = game.addResponse(r, ACTION_TRANSFER,
@@ -207,7 +208,8 @@ func (game *TritsGame) PlaceCoin(from TritsAddress, amount uint64) []TritsGameRe
 						l(LOG_DEBUG, "GAME: can only afford to just return the money, ", game.Nominal*uint64(rew), " goes to ", LogName(game.Owner))
 					}
 				}
-				amount_to_owner := game.Nominal * uint64(rew)
+				//amount_to_owner := game.Nominal * uint64(rew)
+				amount_to_owner := uint64(0)
 				amount_to_bank := game.GetTotal() - amount_to_owner
 				r = game.addResponse(r, ACTION_TRANSFER,
 					game.ThisGame,   // From this game

@@ -10,8 +10,10 @@ type TritsPlayerDumb struct {
 
 type TritsPlayerDefault struct {
 	Addr         TritsAddress // Player's address
+	Player_type  string       // Player type ("dumb", "zion" etc...)
 	banker       TritsBanker  // Connection to the banker
 	started_with uint64       // Initail pocket before joining the game
+
 }
 
 // Set started_with
@@ -47,6 +49,17 @@ func (p *TritsPlayerDefault) Balance() uint64 {
 func (p *TritsPlayerDefault) GetAddr() TritsAddress {
 	return p.Addr
 }
+
+//Get Player type
+func (p *TritsPlayerDefault) GetPlayerType() string {
+	return p.Player_type
+}
+
+//Recharge if necessary (only zion players can do this)
+func (p *TritsPlayerDefault) Recharge() uint64 {
+	return 0
+}
+
 
 // Borrow money if necessary
 func (p *TritsPlayerDefault) Borrow(max_borrow uint64) uint64 {

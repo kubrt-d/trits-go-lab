@@ -18,9 +18,28 @@ func NewTritsPlayerResponse(game *TritsGame, amount uint64, my_addr TritsAddress
 func NewTritsPlayerFactory(addr TritsAddress, banker TritsBanker, strategy string) TritsPlayer {
 	var out TritsPlayer
 	switch strategy {
-	case "dumb":
+	case "zion":
+		player := TritsPlayerZion{}
+		player.Addr = addr
+		player.Player_type = "zion"
+		player.banker = banker
+		out = &player
+	case "sharp":
+		player := TritsPlayerZionSharp{}
+		player.Addr = addr
+		player.Player_type = "zion"
+		player.banker = banker
+		out = &player
+	case "agent":
+		player := TritsPlayerAgent{}
+		player.Addr = addr
+		player.Player_type = "agent"
+		player.banker = banker
+		out = &player
+	default:
 		player := TritsPlayerDumb{}
 		player.Addr = addr
+		player.Player_type = "dumb"
 		player.banker = banker
 		out = &player
 	}
@@ -37,6 +56,8 @@ type TritsPlayer interface {
 	Bet(desk []*TritsGame) []TritsPlayerResponse
 	Name() string
 	GetAddr() TritsAddress
+	GetPlayerType() string
+	Recharge() uint64
 }
 
 // Helper function to get player name by address statically

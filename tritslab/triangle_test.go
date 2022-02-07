@@ -54,3 +54,4 @@ func TestTritsTriangle_HitVertice(t *testing.T) {
 	})
 	
 }
+

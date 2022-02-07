@@ -83,6 +83,18 @@ func LogPlayersBalances(banker TritsBanker) string {
 	return out
 }
 
+func LogZionTotal(banker TritsBanker) uint64 {
+	total := banker.Tell(NewTritsAddress(BankAddr))
+	s := NewTritsSquad(banker)
+	for _, p := range s.squad {
+		if p.GetPlayerType() == "zion" {
+			total += banker.Tell(p.GetAddr())
+		}
+	}
+	return total
+}
+
+
 // Human readable game names fo logging purposes
 func GameName(a TritsAddress) string {
 	t := TritsTable{}

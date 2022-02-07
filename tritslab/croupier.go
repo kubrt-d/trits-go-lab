@@ -139,17 +139,41 @@ func (c *TritsCroupier) AskAround() bool {
 				c.Banker.MoveFunds(NewTritsAddress(LenderAddr), c.Players.squad[j].GetAddr(), amount)
 			}
 		}
+		/*
+			if TD {
+				c.Banker.gameshealthcheck(c.Table.Desk)
+				l(LOG_DEBUG, "CROUPIER asks ", c.Players.squad[j].Name(), " if she wants to take profits ...")
+			}
 
-		if TD {
-			c.Banker.gameshealthcheck(c.Table.Desk)
-			l(LOG_DEBUG, "CROUPIER asks ", c.Players.squad[j].Name(), " if she wants to take profits ...")
+			amount = c.Players.squad[j].TakeProfit()
+
+			if amount > 0 {
+				c.Banker.MoveFunds(c.Players.squad[j].GetAddr(), NewTritsAddress(LenderAddr), amount)
+			}
+		*/
+
+		if c.Players.squad[j].GetPlayerType() == "zion" {
+			if TD {
+				c.Banker.gameshealthcheck(c.Table.Desk)
+				l(LOG_DEBUG, "CROUPIER asks zion player  ", c.Players.squad[j].Name(), " if she wants to recharge ...")
+			}
+			amount = c.Players.squad[j].Recharge()
+			if amount > 0 {
+				bank_addr := NewTritsAddress(BankAddr)
+				if c.Banker.Tell(bank_addr) >= amount {
+					c.Banker.MoveFunds(bank_addr, c.Players.squad[j].GetAddr(), amount)
+					if TD {
+						c.Banker.gameshealthcheck(c.Table.Desk)
+						l(LOG_DEBUG, "BANK slips ", amount, " under the table to the zion player  ", c.Players.squad[j].Name())
+					}
+				} else {
+					if TD {
+						l(LOG_DEBUG, "BANK can't afford to help zion player  ", c.Players.squad[j].Name())
+					}
+				}
+			}
 		}
 
-		amount = c.Players.squad[j].TakeProfit()
-
-		if amount > 0 {
-			c.Banker.MoveFunds(c.Players.squad[j].GetAddr(), NewTritsAddress(LenderAddr), amount)
-		}
 		j++
 	}
 	return some_player_alive

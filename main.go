@@ -15,17 +15,17 @@ func main() {
 		}
 		defer logFile.Close()
 	*/
-	fmt.Print("ROUND,Bank," + tl.LogPlayersHeaders())
+	fmt.Print("ROUND,Bank,Zion," + tl.LogPlayersHeaders())
 	playsome()
 }
 
 func playsome() {
-	c := tl.NewTritsCroupier(100000, 10000, 0)
+	c := tl.NewTritsCroupier(140000, 10000, 10000)
 	var j = 0
 	var cont = true
 	for cont && j < 1000000 {
 		//tl.L(tl.LOG_DEBUG, "Round:", j)
-		fmt.Print(fmt.Sprint(j, ",", c.Banker.Tell(tl.NewTritsAddress(tl.BankAddr)), ",", tl.LogPlayersBalances(c.Banker)))
+		fmt.Print(fmt.Sprint(j, ",", c.Banker.Tell(tl.NewTritsAddress(tl.BankAddr)), ",", tl.LogZionTotal(c.Banker), ",", tl.LogPlayersBalances(c.Banker)))
 		j++
 		cont = c.AskAround()
 
