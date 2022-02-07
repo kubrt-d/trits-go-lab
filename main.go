@@ -2,11 +2,13 @@ package main
 
 import (
 	"fmt"
+	mr "math/rand"
+	"time"
 	tl "trits/tritslab"
 )
 
 func main() {
-
+	mr.Seed(time.Now().UnixNano())
 	/*
 		// open log file
 		logFile, err := os.OpenFile(tl.LOG_FILE, os.O_APPEND|os.O_RDWR|os.O_CREATE, 0644)

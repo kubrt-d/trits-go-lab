@@ -12,3 +12,11 @@ func TestTritsDice_Throw3Dice(t *testing.T) {
 		}
 	})
 }
+
+func BenchmarkTritsDice_Throw3Dice(b *testing.B) {
+	dice := NewTritsDice()
+	for n := 0; n < b.N; n++ {
+		dice.Throw3Dice()
+	}
+}
+

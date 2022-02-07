@@ -43,7 +43,7 @@ func TestTritsTriangle_HitVertice(t *testing.T) {
 		r1 := rand.New(s1)
 		for counter < 100 { // 100 rounds would be extremely rare
 			counter++
-			v := int8(r1.Intn(3)) + 1
+			v := byte(r1.Intn(3)) + 1
 			if tr.HitVertice(v, foo_addr) {
 				counter = 111
 			}

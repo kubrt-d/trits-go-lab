@@ -38,7 +38,7 @@ test(t, response,assert)
 
 func TestTritsGame_PlaceCoin(t *testing.T) {
 
-	dice := NewTritsSequence([]int8{1, 2, 3, 2, 2, 3, 1, 2, 2, 3, 2, 3, 3, 1, 2, 3, 1, 1})
+	dice := NewTritsSequence([]byte{1, 2, 3, 2, 2, 3, 1, 2, 2, 3, 2, 3, 3, 1, 2, 3, 1, 1})
 	game_addr := NewTritsAddress("e28533750bee16842a5cd4f533d235770e407367")
 	neo_addr := NewTritsAddress(NeoAddr)
 	bank_addr := NewTritsAddress(BankAddr)

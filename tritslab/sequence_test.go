@@ -3,7 +3,7 @@ package tritslab
 import "testing"
 
 func TestTritsSequence_Throw3Dice(t *testing.T) {
-	sequence := NewTritsSequence([]int8{1, 2, 3, 2, 1, 3})
+	sequence := NewTritsSequence([]byte{1, 2, 3, 2, 1, 3})
 
 	t.Run("Seq 1", func(t *testing.T) {
 		got := sequence.Throw3Dice()

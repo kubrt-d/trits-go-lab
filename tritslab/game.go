@@ -170,7 +170,7 @@ func (game *TritsGame) PlaceCoin(from TritsAddress, amount uint64) []TritsGameRe
 	// THROW COIN - place coin randomly on the trit
 	if game.Nominal > 0 && game.Middle > 0 {
 		var flip bool = false
-		var last_destiny int8 = 0
+		var last_destiny byte = 0
 		for coins_in > 0 && !flip {
 			last_destiny = game.rand.Throw3Dice() // Choose random arm
 			if TD {
