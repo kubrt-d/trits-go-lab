@@ -32,6 +32,7 @@ func main() {
 
 func playsome(infWAPI api.WriteAPI) {
 	c := tl.NewTritsCroupier(140000, 10000, 10000)
+	defer c.Destroy()
 	var j = 0
 	var cont = true
 	for cont && j < 1000000 {

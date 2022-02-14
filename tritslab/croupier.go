@@ -1,13 +1,20 @@
 package tritslab
 
-//"math/rand"
-//"time"
+import (
+	influxdb2 "github.com/influxdata/influxdb-client-go/v2"
+	"github.com/influxdata/influxdb-client-go/v2/api"
+)
 
 type TritsCroupier struct {
 	Table      TritsTable  // Croupier's table
 	Players    TritsSquad  // Players
 	Banker     TritsBanker // Banker
 	max_borrow uint64      // Max amount which can be borrowed
+
+	// Influx related properties
+	influxClient  influxdb2.Client // Influx connection
+	influxCounter uint             // Influx counter
+	influxApi     api.WriteAPI     // Influx counter
 }
 
 // Croupier starts his day, with a certain lot for players and something to give to the bank
@@ -17,7 +24,15 @@ func NewTritsCroupier(lot uint64, bank_start uint64, max_borrow uint64) *TritsCr
 		lot = lot - 1
 	}
 	bank := NewTritsAddress(BankAddr)
-	croupier := new(TritsCroupier)                     // Wash your hands
+	croupier := new(TritsCroupier) // Wash your hands
+
+	// Setup InfluxDB
+	if INFLUX {
+		croupier.influxClient = influxdb2.NewClient("http://"+INFLUX_HOST+":"+INFLUX_PORT, INFLUX_API_KEY)
+		croupier.influxCounter = 0
+		croupier.influxApi = croupier.influxClient.WriteAPI(INFLUX_ORG, INFLUX_BUCKET)
+	}
+
 	croupier.Banker = NewTritsBanker(lot + bank_start) // Hire a banker and put everything in the bank
 	if TD {
 		l(LOG_INFO, "CROUPIER invites BANKER and creates a bank account with ", lot+bank_start)
@@ -48,6 +63,24 @@ func NewTritsCroupier(lot uint64, bank_start uint64, max_borrow uint64) *TritsCr
 		l(LOG_DEBUG, "BANK: ", croupier.Banker.DumpBank())
 	}
 	return croupier
+}
+
+func (c *TritsCroupier) Destroy() {
+	if INFLUX {
+		c.influxApi.Flush()
+		c.influxClient.Close()
+	}
+}
+
+func (c *TritsCroupier) writeMetrics() {
+	if !INFLUX {
+		return
+	}
+	if c.influxCounter > INFLUX_FLUSH_EVERY {
+		c.influxApi.Flush()
+	}
+	c.influxCounter++
+
 }
 
 // Ask all players and do what they say
